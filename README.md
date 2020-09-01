@@ -8,7 +8,7 @@ evocomp/
 ├── src/
 │   ├── <our code>
 ├── LICENSE
-├── Pipfile
+├── requirements.txt
 ├── README.md
 ├── demos/
 │   ├── competition_results.py
