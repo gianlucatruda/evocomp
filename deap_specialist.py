@@ -46,10 +46,18 @@ toolbox.register("select", tools.selTournament, tournsize=3)
 
 
 # We define our evaluation function
-def evaluate(individual):
-    """ Custom evaluation function based on evoman specialist demo (NN)
+def evaluate(individual: list) -> list:
+    """Custom evaluation function based on evoman specialist demo (NN)
 
-    individual : the genotype of this individual (I think)
+    Parameters
+    ----------
+    individual : list
+        The genotype of the individual
+
+    Returns
+    -------
+    list
+        The fitness score(s)
     """
 
     # initializes simulation in individual evolution mode, for single static enemy.
@@ -62,7 +70,9 @@ def evaluate(individual):
                       speed="fastest")
 
     # Run the simulation (score fitness)
-    fitness, player_life, enemy_life, sim_time = env.play(pcont=np.array(individual))
+    fitness, player_life, enemy_life, sim_time = env.play(
+        pcont=np.array(individual))
+
     return [fitness]
 
 
@@ -79,4 +89,5 @@ NGEN = 5  # The number of generations
 
 print("Running Simple EA...")
 # We will use one of DEAP's provided evolutionary algorithms for now
-final_population = algorithms.eaSimple(pop, toolbox, CXPB, MUTPB, NGEN, verbose=True)
+final_population = algorithms.eaSimple(
+    pop, toolbox, CXPB, MUTPB, NGEN, verbose=True)
