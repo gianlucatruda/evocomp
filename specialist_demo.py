@@ -123,7 +123,7 @@ def doomsday(pop, fit_pop, npop, n_vars, dom_u, dom_l):
 
 if __name__ == "__main__":
     # Set directory for saving logs and experiment states
-    EXPERIMENT_DIRECTORY = 'experiments/deap_individual_demo'
+    EXPERIMENT_DIRECTORY = 'experiments/refactored_specialist_demo'
     if not os.path.exists(EXPERIMENT_DIRECTORY):
         os.makedirs(EXPERIMENT_DIRECTORY)
 
