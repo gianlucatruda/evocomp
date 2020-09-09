@@ -9,6 +9,8 @@ from deap import base, creator, tools, algorithms
 from simple_controller import player_controller
 from evoman.environment import Environment
 
+os.putenv("SDL_VIDEODRIVER", "fbcon")
+os.environ["SDL_VIDEODRIVER"] = 'dummy'
 
 """
 Reference: https://deap.readthedocs.io/en/master/overview.htm
@@ -33,14 +35,14 @@ creator.create("Individual", list, fitness=creator.FitnessMax)
 # Create a new "toolbox"
 toolbox = base.Toolbox()
 # Attributes for our individuals are initialised as random floats
-toolbox.register("attribute", random.random)
+toolbox.register("attribute", random.uniform, -1, 1)
 toolbox.register("individual", tools.initRepeat, creator.Individual,
                  toolbox.attribute, n=IND_SIZE)
 # Define a population of these individuals
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
 # We set our operators (out-of-the-box ones, for now)
-toolbox.register("mate", tools.cxTwoPoint)
+toolbox.register("mate", tools.cxUniform, indpb=0.3)
 toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
 toolbox.register("select", tools.selTournament, tournsize=3)
 
@@ -80,12 +82,12 @@ def evaluate(individual: list) -> list:
 toolbox.register("evaluate", evaluate)
 
 # Initialise our population
-pop = toolbox.population(n=5)
+pop = toolbox.population(n=100)
 
 # Define some NB parameters for our EA
 CXPB = 0.5  # Probability of mating two individuals
 MUTPB = 0.2  # Probability of mutating an individual
-NGEN = 5  # The number of generations
+NGEN = 10  # The number of generations
 
 print("Running Simple EA...")
 # We will use one of DEAP's provided evolutionary algorithms for now
