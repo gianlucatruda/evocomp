@@ -9,6 +9,7 @@ from deap import base, creator, tools, algorithms
 from simple_controller import player_controller
 from evoman.environment import Environment
 from auxiliary_funcs import selfAdaptiveMutation
+from objproxies import CallbackProxy
 
 os.putenv("SDL_VIDEODRIVER", "fbcon")
 os.environ["SDL_VIDEODRIVER"] = 'dummy'
@@ -49,7 +50,7 @@ toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 toolbox.register("mate", tools.cxUniform, indpb=0.3)
 # toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
 
-toolbox.register("mutate", selfAdaptiveMutation, step=curr_gen)
+toolbox.register("mutate", selfAdaptiveMutation, step=CallbackProxy(lambda: curr_gen))
 toolbox.register("select", tools.selTournament, tournsize=3)
 
 
@@ -123,8 +124,8 @@ final_population = algorithms.eaSimple(
 evaluation(pop)
 for g in range(NGEN):
     curr_gen = g+1
+    pop = list(toolbox.select(pop, N_POP))
     offspring = algorithms.varAnd(pop, toolbox, CXPB, MUTPB)
-    # print("Size of offspring {}".format(len(offspring)))
     evaluation(offspring)
-    pop = list(toolbox.select(pop + offspring, N_POP))
+    pop = offspring
 final_population = pop

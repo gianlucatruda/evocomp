@@ -1,5 +1,3 @@
-import sys
-sys.path.insert(0, 'evoman')
 import numpy as np
 from math import exp, sqrt
 
@@ -28,11 +26,10 @@ def selfAdaptiveMutation(individual: list, step: int) -> list:
 
     for i in range(idxSigma1, len(individual)):
         # Updating first the sigma
-        # print(i)
+        individual[i] = abs(individual[i]) # sometimes it comes negative from the recombination operation
         individual[i] = individual[i] * exp(np.random.normal(0, 1/(sqrt(2*step))) + np.random.normal(0, 1/(sqrt(2*sqrt(step)))))
 
         # Updating secondly the x
-        # print(i-idxSigma1, individual[i])
         individual[i-idxSigma1] = individual[i-idxSigma1] + np.random.normal(0, individual[i])
 
     return individual,
