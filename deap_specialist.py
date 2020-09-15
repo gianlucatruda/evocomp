@@ -1,19 +1,18 @@
-
-import sys
-sys.path.insert(0, 'evoman')
 import os
+sys.path.insert(0, 'evoman')
+
+import json
+import random
+import sys
+from datetime import datetime
+
 import numpy as np
 import pandas as pd
-
-import random
-from datetime import datetime
-import json
-from deap import base, creator, tools, algorithms
-
-from simple_controller import player_controller
-from evoman.environment import Environment
+from deap import algorithms, base, creator, tools
 
 import evo_utils
+from evoman.environment import Environment
+from simple_controller import player_controller
 
 os.putenv("SDL_VIDEODRIVER", "fbcon")
 os.environ["SDL_VIDEODRIVER"] = 'dummy'
