@@ -3,6 +3,8 @@ import sys
 sys.path.insert(0, 'evoman')
 import os
 import numpy as np
+import pandas as pd
+from scipy.spatial import distance
 import random
 from deap import base, creator, tools, algorithms
 
@@ -101,9 +103,40 @@ pop = toolbox.population(n=100)
 # Define some NB parameters for our EA
 CXPB = 0.5  # Probability of mating two individuals
 MUTPB = 0.2  # Probability of mutating an individual
-NGEN = 10  # The number of generations
+
+# Create Hall of Fame (keeps N best individuals over all history)
+hall_of_fame = tools.HallOfFame(maxsize=10)
+
+# Create a statistics object to log stats about `fitness` to our logbook
+fitness_stats = tools.Statistics(key=lambda ind: ind.fitness.values)
+# Add some keys and functions to the statistics object
+fitness_stats.register("min_fitness", np.max)
+fitness_stats.register("mean_fitness", np.mean)
+fitness_stats.register("std_fitness", np.std)
+fitness_stats.register("max_fitness", np.max)
+
+
+def diversity_L1(pop):
+    """ Calculate mean Euclidean (L1) distance between every pair
+        of genomes in the population.
+    """
+    dists = [distance.cityblock(i, j) for i in pop for j in pop if i != j]
+    return np.mean(dists)
+
+
+# Create a statistics object to log stats about `genome` to our logbook
+genome_stats = tools.Statistics(key=lambda ind: ind)
+# Add some keys and functions to the statistics object
+genome_stats.register("diversity", diversity_L1)
+genome_stats.register("genome_size", lambda pop: np.sum([len(i) for i in pop]))
+
+# Make a single statistics object from both our stats objects
+stats = tools.MultiStatistics(fitness=fitness_stats, genome=genome_stats)
+
 
 print("Running Simple EA...")
 # We will use one of DEAP's provided evolutionary algorithms for now
-final_population = algorithms.eaSimple(
-    pop, toolbox, CXPB, MUTPB, NGEN, verbose=True)
+final_population, logbook = algorithms.eaSimple(
+    pop, toolbox, CXPB, MUTPB, NGEN,
+    halloffame=hall_of_fame, stats=stats, verbose=True)
+
