@@ -63,13 +63,27 @@ def evaluate(individual: list) -> list:
     """
 
     # initializes simulation in individual evolution mode, for single static enemy.
-    env = Environment(experiment_name=EXPERIMENT_DIRECTORY,
-                      enemies=[2],
-                      playermode="ai",
+    env = Environment(
+        experiment_name=EXPERIMENT_DIRECTORY,
+        multiplemode="no",
+        enemies=[2],                 # 1 to 8
+        playermode="ai",
                       player_controller=nn_controller,
-                      enemymode="static",
+        enemymode="static",
+        player_controller=nn_controller,
                       level=2,
-                      speed="fastest")
+        speed="fastest",
+        inputscoded="no",            # yes or no
+        randomini="no",              # yes or no
+        sound="off",                 # on or off
+        logs="off",                   # on or off
+        savelogs="yes",              # yes or no
+        clockprec="low",
+        timeexpire=3000,             # integer
+        overturetime=100,            # integer
+        solutions=None,              # any
+        fullscreen=False,            # True or False
+    )
 
     # Run the simulation (score fitness)
     fitness, player_life, enemy_life, sim_time = env.play(
