@@ -70,7 +70,6 @@ def evaluate(individual: list) -> list:
         multiplemode="no",
         enemies=[2],                 # 1 to 8
         playermode="ai",
-                      player_controller=nn_controller,
         enemymode="static",
         player_controller=nn_controller,
                       level=2,
@@ -117,7 +116,7 @@ fitness_stats.register("max_fitness", np.max)
 
 
 def diversity_L1(pop):
-    """ Calculate mean Euclidean (L1) distance between every pair
+    """ Calculate mean Manhattan (L1) distance between every pair
         of genomes in the population.
     """
     dists = [distance.cityblock(i, j) for i in pop for j in pop if i != j]
