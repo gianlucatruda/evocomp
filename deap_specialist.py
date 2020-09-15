@@ -110,7 +110,7 @@ hall_of_fame = tools.HallOfFame(maxsize=10)
 # Create a statistics object to log stats about `fitness` to our logbook
 fitness_stats = tools.Statistics(key=lambda ind: ind.fitness.values)
 # Add some keys and functions to the statistics object
-fitness_stats.register("min_fitness", np.max)
+fitness_stats.register("min_fitness", np.min)
 fitness_stats.register("mean_fitness", np.mean)
 fitness_stats.register("std_fitness", np.std)
 fitness_stats.register("max_fitness", np.max)
