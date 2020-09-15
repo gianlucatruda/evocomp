@@ -13,7 +13,8 @@ from simple_controller import player_controller
 
 def evaluate(individual: list,
              player_controller: Controller,
-             experiment_name: str) -> list:
+             experiment_name: str,
+             enemies=[2]) -> list:
     """Custom evaluation function based on evoman specialist (NN)
 
     Parameters
@@ -25,6 +26,9 @@ def evaluate(individual: list,
     experiment_name : str
         The name of the experiment (usually a path like 'experiments/tmp').
         Used for saving state and evoman logs.
+    enemies : list
+        Which enemy/enemies to fight against, default [2]
+
 
     Returns
     -------
@@ -36,7 +40,7 @@ def evaluate(individual: list,
     env = Environment(
         experiment_name=experiment_name,
         multiplemode="no",
-        enemies=[2],                 # 1 to 8
+        enemies=enemies,
         playermode="ai",
         enemymode="static",
         player_controller=player_controller,
