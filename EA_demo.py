@@ -109,21 +109,18 @@ class MyDemoEAInstance(BaseEAInstance):
             halloffame=self.hall_of_fame, stats=self.stats, verbose=True)
 
         # Get dataframe of stats
-        df_stats = evo_utils.compile_stats(self.logbook)
-        print('\nFinal results:\n')
-        print(df_stats)
+        self.stats = evo_utils.compile_stats(self.logbook)
 
         # Get dictionary of best_individuals -> {fitness: [genome], ...}
         self.best_individuals = evo_utils.compile_best_individuals(
             self.hall_of_fame)
         self.top_scores = sorted(
             list(self.best_individuals.keys()), reverse=True)
-        print(f"\nTop scores: {self.top_scores}")
 
         # Save the statistics to CSV and the best individuals to JSON
         now = datetime.now().strftime("%m-%d-%H_%M_%S")  # Timestamp
-        df_stats.to_csv(f"{self.experiment_directory}/{now}_logbook.csv")
+        self.stats.to_csv(f"{self.experiment_directory}/{now}_logbook.csv")
         with open(f"{self.experiment_directory}/{now}_best_individuals.json", 'w') as file:
             json.dump(self.best_individuals, file)
 
-        return self.final_population, self.logbook, self.best_individuals
+        return self.final_population, self.stats, self.best_individuals
