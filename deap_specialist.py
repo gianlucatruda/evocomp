@@ -56,10 +56,8 @@ toolbox.register("individual", tools.initRepeat, creator.Individual,
 # Define a population of these individuals
 toolbox.register("population", tools.initRepeat, list, toolbox.individual)
 
-# We set our operators (out-of-the-box ones, for now)
+# We set our operators
 toolbox.register("mate", tools.cxUniform, indpb=0.3)
-# toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=0.1)
-
 toolbox.register("mutate", self_adaptive_mutation,
                  step=CallbackProxy(lambda: curr_gen))
 toolbox.register("select", tools.selTournament, tournsize=3)
