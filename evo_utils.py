@@ -1,5 +1,7 @@
 import sys
 sys.path.insert(0, 'evoman')
+import os
+from abc import ABC
 
 import numpy as np
 import pandas as pd
@@ -13,7 +15,8 @@ from simple_controller import player_controller
 
 def evaluate(individual: list,
              player_controller: Controller,
-             experiment_name: str) -> list:
+             experiment_name: str,
+             enemies=[2]) -> list:
     """Custom evaluation function based on evoman specialist (NN)
 
     Parameters
@@ -36,7 +39,7 @@ def evaluate(individual: list,
     env = Environment(
         experiment_name=experiment_name,
         multiplemode="no",
-        enemies=[2],                 # 1 to 8
+        enemies=enemies,                 # 1 to 8
         playermode="ai",
         enemymode="static",
         player_controller=player_controller,
@@ -159,3 +162,37 @@ def compile_best_individuals(hall_of_fame: tools.HallOfFame) -> dict:
         best_individuals[key.values[0]] = item
 
     return best_individuals
+
+
+class BaseEAInstance(ABC):
+    """Base class for EA instances.
+    """
+
+    def __init__(self, experiment_directory='experiments/tmp'):
+        self.experiment_directory = experiment_directory
+        self.enemies = None
+        self.player_controller = None
+        self.toolbox = None
+        self.population = None
+        self.hall_of_fame = None
+        self.stats = None
+        self.final_population = None
+        self.logbook = None
+        self.best_individuals = None
+        self.top_scores = None
+
+        # Set directory for saving logs and experiment states
+        if not os.path.exists(self.experiment_directory):
+            os.makedirs(self.experiment_directory)
+
+    def evolve(self):
+        raise NotImplementedError()
+
+    def __repr__(self):
+        params = {
+            'enemies': self.enemies,
+            'toolbox': self.toolbox.__repr__(),
+            'pop_size': len(self.population),
+            'top_fitness': np.max(self.top_scores),
+        }
+        return f"EA instance: {params}"
