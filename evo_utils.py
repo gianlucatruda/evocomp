@@ -28,6 +28,9 @@ def evaluate(individual: list,
     experiment_name : str
         The name of the experiment (usually a path like 'experiments/tmp').
         Used for saving state and evoman logs.
+    enemies : list
+        Which enemy/enemies to fight against, default [2]
+
 
     Returns
     -------
@@ -39,7 +42,7 @@ def evaluate(individual: list,
     env = Environment(
         experiment_name=experiment_name,
         multiplemode="no",
-        enemies=enemies,                 # 1 to 8
+        enemies=enemies,
         playermode="ai",
         enemymode="static",
         player_controller=player_controller,
@@ -106,7 +109,7 @@ def make_custom_statistics() -> tools.MultiStatistics:
     # Add some keys and functions to the statistics object
     genome_stats.register("diversity", diversity_L1)
     genome_stats.register(
-        "genome_size", lambda pop: np.sum([len(i) for i in pop]))
+        "mean_genome_size", lambda pop: np.mean([len(i) for i in pop]))
 
     # Make a single statistics object from both our stats objects
     stats = tools.MultiStatistics(fitness=fitness_stats, genome=genome_stats)

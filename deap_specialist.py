@@ -90,23 +90,31 @@ hall_of_fame = tools.HallOfFame(maxsize=HOFSIZE)
 # Make a single statistics object to monitor fitness and genome stats
 stats = evo_utils.make_custom_statistics()
 
-print(f"\nRunning EA for {NGEN} generations...\n")
-final_population, logbook = algorithms.eaSimple(
-    pop, toolbox, CXPB, MUTPB, NGEN,
-    halloffame=hall_of_fame, stats=stats, verbose=True)
-
-# Get dataframe of stats
-df_stats = evo_utils.compile_stats(logbook)
-print('\nFinal results:\n')
-print(df_stats)
-
-# Get dictionary of best_individuals -> {fitness: [genome], ...}
-best_individuals = evo_utils.compile_best_individuals(hall_of_fame)
-top_scores = sorted(list(best_individuals.keys()), reverse=True)
-print(f"\nTop scores: {top_scores}")
-
-# Save the statistics to CSV and the best individuals to JSON
 now = datetime.now().strftime("%m-%d-%H_%M_%S")  # Timestamp
-df_stats.to_csv(f"{EXPERIMENT_DIRECTORY}/{now}_logbook.csv")
-with open(f"{EXPERIMENT_DIRECTORY}/{now}_best_individuals.json", 'w') as file:
-    json.dump(best_individuals, file)
+print(f"\n{now}: Running EA for {NGEN} generations...\n")
+try:
+    final_population, logbook = algorithms.eaSimple(
+        pop, toolbox, CXPB, MUTPB, NGEN,
+        halloffame=hall_of_fame, stats=stats, verbose=True)
+except KeyboardInterrupt as e:
+    print(f"\nINTERRUPT: Stopping EA early. Stats will be lost.\n")
+else:  # Only executed if NO exceptions
+    # Get dataframe of stats
+    df_stats = evo_utils.compile_stats(logbook)
+    print('\nFinal results:\n')
+    print(df_stats, end='\n\n')
+    # Save the statistics to CSV
+    file_name = f"{EXPERIMENT_DIRECTORY}/{now}_logbook.csv"
+    df_stats.to_csv(file_name)
+    print(f"Statistics saved to '{file_name}'.")
+finally:  # Always executed
+    # Get dictionary of best_individuals -> {fitness: [genome], ...}
+    best_individuals = evo_utils.compile_best_individuals(hall_of_fame)
+    top_scores = sorted(list(best_individuals.keys()), reverse=True)
+    if len(top_scores) > 0:
+        print(f"\nTop scores: {top_scores}")
+        # Save the best individuals to JSON file
+        file_name = f"{EXPERIMENT_DIRECTORY}/{now}_best_individuals.json"
+        with open(file_name, 'w') as file:
+            json.dump(best_individuals, file)
+        print(f"Best individuals saved to '{file_name}'.")
