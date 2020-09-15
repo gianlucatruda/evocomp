@@ -102,6 +102,7 @@ pop = toolbox.population(n=100)
 # Define some NB parameters for our EA
 CXPB = 0.5  # Probability of mating two individuals
 MUTPB = 0.2  # Probability of mutating an individual
+NGEN = 5  # The number of generations
 
 # Create Hall of Fame (keeps N best individuals over all history)
 hall_of_fame = tools.HallOfFame(maxsize=10)
