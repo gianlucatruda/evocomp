@@ -6,6 +6,8 @@ import numpy as np
 import pandas as pd
 from scipy.spatial import distance
 import random
+from datetime import datetime
+import json
 from deap import base, creator, tools, algorithms
 
 from simple_controller import player_controller
@@ -72,7 +74,7 @@ def evaluate(individual: list) -> list:
         playermode="ai",
         enemymode="static",
         player_controller=nn_controller,
-                      level=2,
+        level=2,
         speed="fastest",
         inputscoded="no",            # yes or no
         randomini="no",              # yes or no
@@ -97,7 +99,7 @@ def evaluate(individual: list) -> list:
 toolbox.register("evaluate", evaluate)
 
 # Initialise our population
-pop = toolbox.population(n=100)
+pop = toolbox.population(n=10)
 
 # Define some NB parameters for our EA
 CXPB = 0.5  # Probability of mating two individuals
@@ -140,3 +142,20 @@ final_population, logbook = algorithms.eaSimple(
     pop, toolbox, CXPB, MUTPB, NGEN,
     halloffame=hall_of_fame, stats=stats, verbose=True)
 
+# Build dataframe of results
+df_fitness = pd.DataFrame(logbook.chapters['fitness'])
+df_genome = pd.DataFrame(logbook.chapters['genome'])
+df_stats = df_fitness.merge(df_genome, on=['gen', 'nevals'])
+df_stats.set_index('gen', inplace=True)
+print(df_stats)
+
+# Save logbook data to timestamped CSV file
+now = datetime.now().strftime("%m-%d-%H_%M_%S")
+df_stats.to_csv(f"{EXPERIMENT_DIRECTORY}/{now}_logbook.csv")
+
+# Save hall of fame (the best genotypes over all generations)
+best_individuals = {}
+for key, item in zip(hall_of_fame.keys, hall_of_fame.items):
+    best_individuals[key.values[0]] = item
+with open(f"{EXPERIMENT_DIRECTORY}/{now}_best_individuals.json", 'w') as file:
+    json.dump(best_individuals, file)
