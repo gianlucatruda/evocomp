@@ -1,9 +1,9 @@
-import os
+import sys
 sys.path.insert(0, 'evoman')
 
+import os
 import json
 import random
-import sys
 from datetime import datetime
 
 import numpy as np
