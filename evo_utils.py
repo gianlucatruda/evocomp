@@ -107,7 +107,7 @@ def make_custom_statistics() -> tools.MultiStatistics:
     # Add some keys and functions to the statistics object
     genome_stats.register("diversity", diversity_L1)
     genome_stats.register(
-        "genome_size", lambda pop: np.sum([len(i) for i in pop]))
+        "mean_genome_size", lambda pop: np.mean([len(i) for i in pop]))
 
     # Make a single statistics object from both our stats objects
     stats = tools.MultiStatistics(fitness=fitness_stats, genome=genome_stats)
