@@ -15,8 +15,8 @@ from simple_controller import player_controller
 
 def evaluate(individual: list,
              player_controller: Controller,
-             experiment_name: str,
-             enemies=[2]) -> list:
+             experiment_name='experiments/tmp',
+             enemies=[2],) -> list:
     """Custom evaluation function based on evoman specialist (NN)
 
     Parameters
