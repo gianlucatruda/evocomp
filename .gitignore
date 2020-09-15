@@ -5,6 +5,7 @@ demos/*
 Pipfile
 *.pdf
 experiments/
+saved_instances
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
