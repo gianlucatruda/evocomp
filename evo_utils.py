@@ -178,7 +178,7 @@ class BaseEAInstance(ABC):
     """Base class for EA instances.
     """
 
-    def __init__(self, experiment_directory='experiments/tmp'):
+    def __init__(self, experiment_directory='experiments/tmp', enemies=[2]):
         self.experiment_directory = experiment_directory
         self.enemies = None
         self.player_controller = None
@@ -195,10 +195,42 @@ class BaseEAInstance(ABC):
         if not os.path.exists(self.experiment_directory):
             os.makedirs(self.experiment_directory)
 
-    def evolve(self):
+    def evolve(self, verbose=True) -> (list, pd.DataFrame, list):
+        """Evolve population under specified parameters.
+
+        Parameters
+        ----------
+        verbose : bool
+            Whether or not to print progress information, default True
+
+        Returns
+        -------
+        (pop, stats, bests) : (list, pd.DataFrame, list)
+            The list of genomes from final generation,
+            the stats as a compiled dataframe,
+            a list of top N genomes.
+        """
+        raise NotImplementedError()
+
+        def evaluate(self, individual: [float], *args, **kwargs) -> [float]:
+        """Runs the evaluation process for this EA on the specified individual.
+
+        Parameters
+        ----------
+        individual : list
+            The genome of the individual to evaluate.
+
+        Returns
+        -------
+        [float]
+            The fitness score (or gain score) wrapped in a list.
+        """
+
         raise NotImplementedError()
 
     def __repr__(self):
+        """Make the class print useful info if print() called on it.
+        """
         params = {
             'enemies': self.enemies,
             'toolbox': self.toolbox.__repr__(),

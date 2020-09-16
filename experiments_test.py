@@ -40,24 +40,22 @@ if __name__ == '__main__':
 
     print(f"\nRunning evaluations...\n")
 
-    for ea_instance in best_performers.keys():
+    for ea_instance in [MyDemoEAInstance, ]:
         print(f"\nInstance: {ea_instance}")
-        for enemy in best_performers[ea_instance].keys():
+        for enemy in best_performers[str(ea_instance)].keys():
             print(f"\nEnemy: {enemy}")
-            top_ten = best_performers[ea_instance][enemy]
+            top_ten = best_performers[str(ea_instance)][enemy]
             # TODO could parallelise this part if needed
             for i, individual in enumerate(tqdm(top_ten, desc='individuals')):
                 for repeat in range(REPEATS):
 
                     # Run simulation to compute gain sore
-                    gain = evaluation_wrapper(
+                    gain = ea_instance().evaluate(
                         individual,
-                        # TODO remove hardcoding
-                        player_controller=player_controller(10),
                         metric='gain')[0]
 
                     # Save results to dictionary
-                    results['ea_instance'].append(ea_instance)
+                    results['ea_instance'].append(str(ea_instance))
                     results['enemy'].append(enemy)
                     results['individual'].append(i)
                     results['gain'].append(gain)

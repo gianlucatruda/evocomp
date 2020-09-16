@@ -125,3 +125,26 @@ class MyDemoEAInstance(BaseEAInstance):
             json.dump(self.best_individuals, file)
 
         return self.final_population, self.stats, self.best_individuals
+
+    def evaluate(self, individual: [float], *args, **kwargs) -> [float]:
+        """Runs the evaluation process for this EA on the specified individual.
+
+        Parameters
+        ----------
+        individual : list
+            The genome of the individual to evaluate.
+
+        Returns
+        -------
+        [float]
+            The fitness score (or gain score) wrapped in a list.
+        """
+
+        return evaluation_wrapper(
+            individual,
+            experiment_name=self.experiment_directory,
+            player_controller=self.player_controller,
+            enemies=self.enemies,
+            *args,
+            **kwargs,
+        )
