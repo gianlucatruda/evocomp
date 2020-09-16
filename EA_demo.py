@@ -100,13 +100,14 @@ class MyDemoEAInstance(BaseEAInstance):
         # Make a single statistics object to monitor fitness and genome stats
         self.stats = evo_utils.make_custom_statistics()
 
-    def evolve(self):
+    def evolve(self, verbose=True):
 
-        print(f"\nRunning EA for {NGEN} generations...\n")
+        if verbose:
+            print(f"\nRunning EA for {NGEN} generations...\n")
 
         self.final_population, self.logbook = algorithms.eaSimple(
             self.population, self.toolbox, CXPB, MUTPB, NGEN,
-            halloffame=self.hall_of_fame, stats=self.stats, verbose=True)
+            halloffame=self.hall_of_fame, stats=self.stats, verbose=verbose)
 
         # Get dataframe of stats
         self.stats = evo_utils.compile_stats(self.logbook)
