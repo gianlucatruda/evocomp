@@ -21,7 +21,7 @@ os.environ["SDL_VIDEODRIVER"] = 'dummy'
 SAVEPATH = 'results'
 ENEMIES = [1, 3, 5]
 REPEATS = 10
-JOBS = 1
+JOBS = 1  # Leave this as 1 unless you want a world of pain
 
 
 def evolve_island(ea_instance, enemy):
