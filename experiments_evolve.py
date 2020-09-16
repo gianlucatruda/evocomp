@@ -15,7 +15,7 @@ from EA_demo import MyDemoEAInstance
 os.putenv("SDL_VIDEODRIVER", "fbcon")
 os.environ["SDL_VIDEODRIVER"] = 'dummy'
 
-SAVEPATH = 'experiment_run'
+SAVEPATH = 'results'
 ENEMIES = [1, 3, 5]
 REPEATS = 10
 
@@ -50,7 +50,7 @@ now = datetime.now().strftime("%m-%d-%H_%M_%S")  # Timestamp
 # Combine the overall statistics
 df_results = pd.concat(results)
 # Save ALL the results to CSV
-df_results.to_csv(f"{SAVEPATH}/{now}_all_results.csv")
+df_results.to_csv(f"{SAVEPATH}/{now}_online_results.csv")
 
 # Save the best performers to JSON
 with open(f"{SAVEPATH}/{now}_best_genomes.json", 'w') as file:
