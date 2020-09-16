@@ -16,7 +16,8 @@ from simple_controller import player_controller
 def evaluate(individual: list,
              player_controller: Controller,
              experiment_name='experiments/tmp',
-             enemies=[2],) -> list:
+             enemies=[2],
+             metric='fitness') -> list:
     """Custom evaluation function based on evoman specialist (NN)
 
     Parameters
@@ -30,12 +31,15 @@ def evaluate(individual: list,
         Used for saving state and evoman logs.
     enemies : list
         Which enemy/enemies to fight against, default [2]
+    metrix : str
+        Whether to return 'fitness' score or 'gain' score, default 'fitness'
 
 
     Returns
     -------
     list
-        The fitness score(s) for the individual
+        The fitness score(s) for the individual (if metric='fitness').
+        Or, the gain score for the individual (if metric='gain').
     """
 
     # initializes simulation in individual evolution mode, for single static enemy.
@@ -63,6 +67,9 @@ def evaluate(individual: list,
     # Run the simulation (score fitness)
     fitness, player_life, enemy_life, sim_time = env.play(
         pcont=np.array(individual))
+
+    if metric == 'gain':
+        return [player_life - enemy_life]
 
     return [fitness]
 

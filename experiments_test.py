@@ -36,7 +36,7 @@ if __name__ == '__main__':
         best_performers = json.load(file)
 
     # Dictionary to save results (later becomes dataframe)
-    results = {'ea_instance': [], 'enemy': [], 'individual': [], 'score': []}
+    results = {'ea_instance': [], 'enemy': [], 'individual': [], 'gain': []}
 
     print(f"\nRunning evaluations...\n")
 
@@ -49,17 +49,18 @@ if __name__ == '__main__':
             for i, individual in enumerate(tqdm(top_ten, desc='individuals')):
                 for repeat in range(REPEATS):
 
-                    # Run simulation
-                    score = evaluation_wrapper(
+                    # Run simulation to compute gain sore
+                    gain = evaluation_wrapper(
                         individual,
                         # TODO remove hardcoding
-                        player_controller=player_controller(10))[0]
+                        player_controller=player_controller(10),
+                        metric='gain')[0]
 
                     # Save results to dictionary
                     results['ea_instance'].append(ea_instance)
                     results['enemy'].append(enemy)
                     results['individual'].append(i)
-                    results['score'].append(score)
+                    results['gain'].append(gain)
 
 # Turn results into a dataframe
 df_results = pd.DataFrame(results)
