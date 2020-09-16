@@ -212,7 +212,7 @@ class BaseEAInstance(ABC):
         """
         raise NotImplementedError()
 
-        def evaluate(self, individual: [float], *args, **kwargs) -> [float]:
+    def evaluate(self, individual: [float], *args, **kwargs) -> [float]:
         """Runs the evaluation process for this EA on the specified individual.
 
         Parameters
