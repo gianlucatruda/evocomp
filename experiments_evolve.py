@@ -22,10 +22,11 @@ SAVEPATH = 'results'
 ENEMIES = [1, 3, 5]
 REPEATS = 10
 JOBS = 1  # Leave this as 1 unless you want a world of pain
+VERBOSE = True
 
 
 def evolve_island(ea_instance, enemy):
-    pop, stats, bests = ea_instance(enemies=[enemy]).evolve(verbose=False)
+    pop, stats, bests = ea_instance(enemies=[enemy]).evolve(verbose=VERBOSE)
 
     # Save the stats (fitness and genome)
     stats['enemy'] = enemy
