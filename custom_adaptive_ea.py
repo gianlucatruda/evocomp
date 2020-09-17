@@ -20,4 +20,6 @@ SAVEPATH = 'results'
 ENEMIES = [1, 3, 5]
 VERBOSE = True
 
+# Testing the custom simpleEA class
 ea = CustomEASimple(enemies=ENEMIES)
+ea.evolve(verbose=VERBOSE)

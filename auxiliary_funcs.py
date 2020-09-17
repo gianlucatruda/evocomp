@@ -1,19 +1,16 @@
 import sys
 sys.path.insert(0, 'evoman')
 import os
+import json
 import numpy as np
 from math import exp, sqrt
 
 
-import numpy as np
 import random
-import pandas as pd
-from deap import base, creator, tools
-from scipy.spatial import distance
+from datetime import datetime
+from deap import algorithms, base, creator, tools
 
 import evo_utils
-from evoman.controller import Controller
-from evoman.environment import Environment
 from objproxies import CallbackProxy
 from simple_controller import player_controller
 
@@ -138,5 +135,102 @@ class CustomEASimple(evo_utils.BaseEAInstance):
         self.stats = evo_utils.make_custom_statistics()
 
     def evolve(self, verbose):
-        pass
-    
+        if verbose:
+            print(f"\nRunning EA for {NGEN} generations...\n")
+
+        self.final_population, self.logbook = eaSimple(
+            self.population, self.toolbox, CXPB, MUTPB, NGEN,
+            halloffame=self.hall_of_fame, stats=self.stats, verbose=verbose)
+
+        # Get dataframe of stats
+        self.stats = evo_utils.compile_stats(self.logbook)
+
+        # Get dictionary of best_individuals -> {fitness: [genome], ...}
+        self.best_individuals = evo_utils.compile_best_individuals(
+            self.hall_of_fame)
+        self.top_scores = sorted(
+            list(self.best_individuals.keys()), reverse=True)
+
+        # Save the statistics to CSV and the best individuals to JSON
+        now = datetime.now().strftime("%m-%d-%H_%M_%S")  # Timestamp
+        self.stats.to_csv(f"{self.experiment_directory}/{now}_logbook.csv")
+        with open(f"{self.experiment_directory}/{now}_best_individuals.json", 'w') as file:
+            json.dump(self.best_individuals, file)
+
+        return self.final_population, self.stats, self.best_individuals
+
+    def evaluate(self, individual: [float], *args, **kwargs) -> [float]:
+        """Runs the evaluation process for this EA on the specified individual.
+
+        Parameters
+        ----------
+        individual : list
+            The genome of the individual to evaluate.
+
+        Returns
+        -------
+        [float]
+            The fitness score (or gain score) wrapped in a list.
+        """
+
+        return evaluation_wrapper(
+            individual,
+            experiment_name=self.experiment_directory,
+            player_controller=self.player_controller,
+            enemies=self.enemies,
+            *args,
+            **kwargs,
+        )
+
+
+def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
+             halloffame=None, verbose=__debug__):
+    """This algorithm reproduce the simplest evolutionary algorithm as
+    presented in chapter 7 of [Back2000]_.
+    Retrieved from Retrieved from https://github.com/DEAP/deap/blob/38083e5923274dfe5ecc0586eb295228f8c99fc4/deap/algorithms.py
+    """
+    logbook = tools.Logbook()
+    logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
+
+    # Evaluate the individuals with an invalid fitness
+    invalid_ind = [ind for ind in population if not ind.fitness.valid]
+    fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+    for ind, fit in zip(invalid_ind, fitnesses):
+        ind.fitness.values = fit
+
+    if halloffame is not None:
+        halloffame.update(population)
+
+    record = stats.compile(population) if stats else {}
+    logbook.record(gen=0, nevals=len(invalid_ind), **record)
+    if verbose:
+        print(logbook.stream)
+
+    # Begin the generational process
+    for gen in range(1, ngen + 1):
+        # Select the next generation individuals
+        offspring = toolbox.select(population, len(population))
+
+        # Vary the pool of individuals
+        offspring = algorithms.varAnd(offspring, toolbox, cxpb, mutpb)
+
+        # Evaluate the individuals with an invalid fitness
+        invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = toolbox.map(toolbox.evaluate, invalid_ind)
+        for ind, fit in zip(invalid_ind, fitnesses):
+            ind.fitness.values = fit
+
+        # Update the hall of fame with the generated individuals
+        if halloffame is not None:
+            halloffame.update(offspring)
+
+        # Replace the current population by the offspring
+        population[:] = offspring
+
+        # Append the current generation statistics to the logbook
+        record = stats.compile(population) if stats else {}
+        logbook.record(gen=gen, nevals=len(invalid_ind), **record)
+        if verbose:
+            print(logbook.stream)
+
+    return population, logbook
