@@ -1,5 +1,7 @@
 import sys
 sys.path.insert(0, 'evoman')
+import os
+from abc import ABC
 
 import numpy as np
 import pandas as pd
@@ -13,7 +15,9 @@ from simple_controller import player_controller
 
 def evaluate(individual: list,
              player_controller: Controller,
-             experiment_name: str) -> list:
+             experiment_name='experiments/tmp',
+             enemies=[2],
+             metric='fitness') -> list:
     """Custom evaluation function based on evoman specialist (NN)
 
     Parameters
@@ -25,18 +29,24 @@ def evaluate(individual: list,
     experiment_name : str
         The name of the experiment (usually a path like 'experiments/tmp').
         Used for saving state and evoman logs.
+    enemies : list
+        Which enemy/enemies to fight against, default [2]
+    metrix : str
+        Whether to return 'fitness' score or 'gain' score, default 'fitness'
+
 
     Returns
     -------
     list
-        The fitness score(s) for the individual
+        The fitness score(s) for the individual (if metric='fitness').
+        Or, the gain score for the individual (if metric='gain').
     """
 
     # initializes simulation in individual evolution mode, for single static enemy.
     env = Environment(
         experiment_name=experiment_name,
         multiplemode="no",
-        enemies=[2],                 # 1 to 8
+        enemies=enemies,
         playermode="ai",
         enemymode="static",
         player_controller=player_controller,
@@ -57,6 +67,9 @@ def evaluate(individual: list,
     # Run the simulation (score fitness)
     fitness, player_life, enemy_life, sim_time = env.play(
         pcont=np.array(individual))
+
+    if metric == 'gain':
+        return [player_life - enemy_life]
 
     return [fitness]
 
@@ -103,7 +116,7 @@ def make_custom_statistics() -> tools.MultiStatistics:
     # Add some keys and functions to the statistics object
     genome_stats.register("diversity", diversity_L1)
     genome_stats.register(
-        "genome_size", lambda pop: np.sum([len(i) for i in pop]))
+        "mean_genome_size", lambda pop: np.mean([len(i) for i in pop]))
 
     # Make a single statistics object from both our stats objects
     stats = tools.MultiStatistics(fitness=fitness_stats, genome=genome_stats)
@@ -159,3 +172,69 @@ def compile_best_individuals(hall_of_fame: tools.HallOfFame) -> dict:
         best_individuals[key.values[0]] = item
 
     return best_individuals
+
+
+class BaseEAInstance(ABC):
+    """Base class for EA instances.
+    """
+
+    def __init__(self, experiment_directory='experiments/tmp', enemies=[2]):
+        self.experiment_directory = experiment_directory
+        self.enemies = None
+        self.player_controller = None
+        self.toolbox = None
+        self.population = None
+        self.hall_of_fame = None
+        self.stats = None
+        self.final_population = None
+        self.logbook = None
+        self.best_individuals = None
+        self.top_scores = None
+
+        # Set directory for saving logs and experiment states
+        if not os.path.exists(self.experiment_directory):
+            os.makedirs(self.experiment_directory)
+
+    def evolve(self, verbose=True) -> (list, pd.DataFrame, list):
+        """Evolve population under specified parameters.
+
+        Parameters
+        ----------
+        verbose : bool
+            Whether or not to print progress information, default True
+
+        Returns
+        -------
+        (pop, stats, bests) : (list, pd.DataFrame, list)
+            The list of genomes from final generation,
+            the stats as a compiled dataframe,
+            a list of top N genomes.
+        """
+        raise NotImplementedError()
+
+    def evaluate(self, individual: [float], *args, **kwargs) -> [float]:
+        """Runs the evaluation process for this EA on the specified individual.
+
+        Parameters
+        ----------
+        individual : list
+            The genome of the individual to evaluate.
+
+        Returns
+        -------
+        [float]
+            The fitness score (or gain score) wrapped in a list.
+        """
+
+        raise NotImplementedError()
+
+    def __repr__(self):
+        """Make the class print useful info if print() called on it.
+        """
+        params = {
+            'enemies': self.enemies,
+            'toolbox': self.toolbox.__repr__(),
+            'pop_size': len(self.population),
+            'top_fitness': np.max(self.top_scores),
+        }
+        return f"EA instance: {params}"
