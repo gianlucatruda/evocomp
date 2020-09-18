@@ -11,6 +11,7 @@ import pandas as pd
 
 import evo_utils
 from auxiliary_funcs import CustomEASimple
+from EA_demo import BaselineEAInstance
 
 
 os.putenv("SDL_VIDEODRIVER", "fbcon")
@@ -19,6 +20,10 @@ os.environ["SDL_VIDEODRIVER"] = 'dummy'
 SAVEPATH = 'results'
 ENEMIES = [1, 3, 5]
 VERBOSE = True
+
+# Testing baseline
+base = BaselineEAInstance(enemies=ENEMIES)
+base.evolve(verbose=VERBOSE)
 
 # Testing the custom simpleEA class
 ea = CustomEASimple(enemies=ENEMIES)

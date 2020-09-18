@@ -6,15 +6,10 @@ import json
 import random
 from datetime import datetime
 
-import numpy as np
-import pandas as pd
 from deap import algorithms, base, creator, tools
 
 import evo_utils
 from evo_utils import BaseEAInstance
-from evoman.environment import Environment
-from auxiliary_funcs import self_adaptive_mutation
-from objproxies import CallbackProxy
 from simple_controller import player_controller
 
 os.putenv("SDL_VIDEODRIVER", "fbcon")
@@ -22,7 +17,7 @@ os.environ["SDL_VIDEODRIVER"] = 'dummy'
 
 N_HIDDEN_NEURONS = 10  # how many neurons in the hidden layer of the NN
 # Genotype size
-IND_SIZE = ((21) * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS+1)*5) * 2
+IND_SIZE = (21) * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS+1)*5
 
 # Define some NB parameters for our EA
 CXPB = 0.5  # Probability of mating two individuals
@@ -32,21 +27,9 @@ POPSIZE = 10  # Number of individuals per generation (population size)
 HOFSIZE = 5  # Maximum size of hall of fame (best genomes)
 
 
-def evaluation_wrapper(individual: [float], *args, **kwargs) -> [float]:
-    """Custom fitness function wrapper for the
-    adaptive mutation technique.
-    """
-
-    # Only first half of genome is evaluated (control weights)
-    control_weights = individual[0:int(len(individual)/2)]
-
-    # Use the evoman evaluation function we've defined
-    fitness = evo_utils.evaluate(control_weights, *args, **kwargs)
-
-    return fitness
 
 
-class MyDemoEAInstance(BaseEAInstance):
+class BaselineEAInstance(BaseEAInstance):
     def __init__(self, experiment_directory='experiments/tmp', enemies=[2]):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
@@ -54,10 +37,6 @@ class MyDemoEAInstance(BaseEAInstance):
         # Set directory for saving logs and experiment states
         if not os.path.exists(self.experiment_directory):
             os.makedirs(self.experiment_directory)
-
-        # TODO this feels naughty
-        global curr_gen
-        curr_gen = 1
 
         # Initialise the controller (neural network) for our AI player
         self.player_controller = player_controller(N_HIDDEN_NEURONS)
@@ -78,14 +57,13 @@ class MyDemoEAInstance(BaseEAInstance):
             "population", tools.initRepeat, list, self.toolbox.individual)
 
         # We set our operators
-        self.toolbox.register("mate", tools.cxUniform, indpb=0.3)
-        self.toolbox.register("mutate", self_adaptive_mutation,
-                              step=CallbackProxy(lambda: curr_gen))
+        self.toolbox.register("mate", tools.cxUniform, indpb=CXPB)
+        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=MUTPB)
         self.toolbox.register("select", tools.selTournament, tournsize=3)
 
         # We then add our custom evaluation function to our toolbox
         self.toolbox.register("evaluate",
-                              evaluation_wrapper,
+                              evo_utils.evaluate,
                               experiment_name=self.experiment_directory,
                               player_controller=self.player_controller,
                               enemies=self.enemies,
@@ -126,25 +104,3 @@ class MyDemoEAInstance(BaseEAInstance):
 
         return self.final_population, self.stats, self.best_individuals
 
-    def evaluate(self, individual: [float], *args, **kwargs) -> [float]:
-        """Runs the evaluation process for this EA on the specified individual.
-
-        Parameters
-        ----------
-        individual : list
-            The genome of the individual to evaluate.
-
-        Returns
-        -------
-        [float]
-            The fitness score (or gain score) wrapped in a list.
-        """
-
-        return evaluation_wrapper(
-            individual,
-            experiment_name=self.experiment_directory,
-            player_controller=self.player_controller,
-            enemies=self.enemies,
-            *args,
-            **kwargs,
-        )

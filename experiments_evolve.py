@@ -10,7 +10,8 @@ import numpy as np
 import pandas as pd
 
 import evo_utils
-from EA_demo import MyDemoEAInstance
+from EA_demo import BaselineEAInstance
+from auxiliary_funcs import CustomEASimple
 
 from joblib import Parallel, delayed
 import multiprocessing
@@ -49,7 +50,7 @@ best_performers = {}
 results = []
 
 
-for ea_instance in [MyDemoEAInstance, ]:
+for ea_instance in [BaselineEAInstance, CustomEASimple]:
     # Instantiate nested dictionary for this instance
     best_performers[str(ea_instance)] = {e: [] for e in ENEMIES}
     for enemy in ENEMIES:
