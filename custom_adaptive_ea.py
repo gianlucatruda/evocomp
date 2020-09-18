@@ -20,11 +20,11 @@ os.environ["SDL_VIDEODRIVER"] = 'dummy'
 SAVEPATH = 'results'
 ENEMIES = [1, 3, 5]
 VERBOSE = True
-
+"""
 # Testing baseline
 base = BaselineEAInstance(enemies=ENEMIES)
 base.evolve(verbose=VERBOSE)
-
+"""
 # Testing the custom simpleEA class
 ea = CustomEASimple(enemies=ENEMIES)
 ea.evolve(verbose=VERBOSE)
