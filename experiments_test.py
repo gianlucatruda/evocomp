@@ -12,7 +12,8 @@ from tqdm import tqdm
 
 import evo_utils
 from simple_controller import player_controller
-from EA_demo import MyDemoEAInstance, evaluation_wrapper
+from EA_base import BaselineEAInstance
+from EA_adaptive import CustomEASimple
 
 os.putenv("SDL_VIDEODRIVER", "fbcon")
 os.environ["SDL_VIDEODRIVER"] = 'dummy'
@@ -40,7 +41,7 @@ if __name__ == '__main__':
 
     print(f"\nRunning evaluations...\n")
 
-    for ea_instance in [MyDemoEAInstance, ]:
+    for ea_instance in [BaselineEAInstance, CustomEASimple]:
         print(f"\nInstance: {ea_instance}")
         for enemy in best_performers[str(ea_instance)].keys():
             print(f"\nEnemy: {enemy}")

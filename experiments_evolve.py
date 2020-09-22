@@ -10,8 +10,8 @@ import numpy as np
 import pandas as pd
 
 import evo_utils
-from EA_demo import BaselineEAInstance
-from auxiliary_funcs import CustomEASimple
+from EA_base import BaselineEAInstance
+from EA_adaptive import CustomEASimple
 
 from joblib import Parallel, delayed
 import multiprocessing
