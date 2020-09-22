@@ -10,10 +10,6 @@ sns.set()
 sns.set_style("ticks")
 sns.set_context('paper')
 
-# Set name of algorithms (TODO remove)
-first_ea = "<class 'EA_demo.MyDemoEAInstance'>"
-second_ea = "<class 'EA_dummy.DummyEAInstance'>"
-
 
 def tidy_instance_name(x):
     return x.split('.')[-1].split("'")[0]
@@ -66,8 +62,7 @@ def specialist_lineplots(df: pd.DataFrame):
     enemies = df['enemy'].unique()
     n_enemies = len(enemies)
     # Get neat versions of the instance names
-    instances = [x.split('.')[-1].split("'")[0]
-                 for x in df['ea_instance'].unique()]
+    instances = df['ea_instance'].unique()
 
     fig, ax = plt.subplots(n_enemies, 1,)
 
@@ -115,19 +110,23 @@ def stat_test_t(df):
     enemies = [enemy_1, enemy_3, enemy_5]
     counter = 1
 
+    # Load names of EA instances
+    instances = df['ea_instance'].unique()
+    ea1, ea2 = instances[0], instances[1]
+
     for enemy in enemies:
-        g1 = enemy.loc[enemy['ea_instance'] == first_ea]
-        g2 = enemy.loc[enemy['ea_instance'] == second_ea]
+        gains1 = enemy.loc[enemy['ea_instance'] == ea1]['gain'].values
+        gains2 = enemy.loc[enemy['ea_instance'] == ea2]['gain'].values
 
         # Perform t-test on gain
         print("t-test")
-        t, p = stats.ttest_ind(g1['gain'], g2['gain'])
+        t, p = stats.ttest_ind(gains1, gains2)
         print(str(counter) + " t value is " + str(t))
         print(str(counter) + " p value is " + str(p))
 
         # Perform Wilcoxon test on gain
         print("Wilcoxon test")
-        w, p2 = stats.wilcoxon(x=g1['gain'], y=g2['gain'], zero_method='wilcox', correction=False,
+        w, p2 = stats.wilcoxon(x=gains1, y=gains2, zero_method='wilcox', correction=False,
                                alternative='two-sided')
         print(str(counter) + " w value is " + str(w))
         print(str(counter) + " p value is " + str(p2))
