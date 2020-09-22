@@ -104,34 +104,34 @@ def specialist_boxplots(df: pd.DataFrame):
 
 
 def stat_test_t(df):
-    enemy_1 = df.loc[df['enemy'] == 1]
-    enemy_3 = df.loc[df['enemy'] == 3]
-    enemy_5 = df.loc[df['enemy'] == 5]
-    enemies = [enemy_1, enemy_3, enemy_5]
-    counter = 1
 
     # Load names of EA instances
     instances = df['ea_instance'].unique()
+    if len(instances) != 2:
+        raise ValueError(
+            "Need exactly 2 EA instances to do significance tests")
     ea1, ea2 = instances[0], instances[1]
 
-    for enemy in enemies:
-        gains1 = enemy.loc[enemy['ea_instance'] == ea1]['gain'].values
-        gains2 = enemy.loc[enemy['ea_instance'] == ea2]['gain'].values
+    stats_results = {'enemy': [], 'statistic': [], 'p_value': []}
 
-        # Perform t-test on gain
-        print("t-test")
-        t, p = stats.ttest_ind(gains1, gains2)
-        print(str(counter) + " t value is " + str(t))
-        print(str(counter) + " p value is " + str(p))
+    for enemy in df['enemy'].unique():
+        gains1 = df[(df['ea_instance'] == ea1) & (
+            df['enemy'] == enemy)]['gain'].values
+        gains2 = df[(df['ea_instance'] == ea2) & (
+            df['enemy'] == enemy)]['gain'].values
 
-        # Perform Wilcoxon test on gain
-        print("Wilcoxon test")
-        w, p2 = stats.wilcoxon(x=gains1, y=gains2, zero_method='wilcox', correction=False,
-                               alternative='two-sided')
-        print(str(counter) + " w value is " + str(w))
-        print(str(counter) + " p value is " + str(p2))
+        # Perform wilcoxon for that enemy
+        w, p = stats.wilcoxon(x=gains1, y=gains2, zero_method='wilcox',
+                              correction=False, alternative='two-sided')
 
-        counter += 2
+        # Save results to dictionary of lists
+        stats_results['enemy'].append(enemy)
+        stats_results['statistic'].append(w)
+        stats_results['p_value'].append(p)
+
+    # Make dataframe of significance results
+    df = pd.DataFrame(stats_results)
+    return df
 
 
 if __name__ == "__main__":
@@ -150,4 +150,6 @@ if __name__ == "__main__":
     specialist_boxplots(offline_summary)
 
     # Significance tests
-    stat_test_t(offline_summary)
+    df_sig = stat_test_t(offline_summary)
+
+    print(df_sig)
