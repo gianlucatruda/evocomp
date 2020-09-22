@@ -5,4 +5,6 @@ deap==1.3.1
 objproxies>=0.9.4
 pandas>=0.25
 scipy>=1.4.1
+matplotlib>=3.0.0
+seaborn>=0.10.0
 tqdm>=4.0
