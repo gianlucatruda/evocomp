@@ -11,7 +11,7 @@ import pandas as pd
 
 import evo_utils
 from EA_adaptive import CustomEASimple
-from EA_demo import BaselineEAInstance
+from EA_base import BaselineEAInstance
 
 
 os.putenv("SDL_VIDEODRIVER", "fbcon")

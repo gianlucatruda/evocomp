@@ -17,13 +17,6 @@ N_HIDDEN_NEURONS = 10  # how many neurons in the hidden layer of the NN
 # Genotype size
 IND_SIZE = ((21) * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS+1)*5) * 2
 
-# Define some NB parameters for our EA
-CXPB = 0.5  # Probability of mating two individuals
-MUTPB = 0.2  # Probability of mutating an individual
-NGEN = 5  # The number of generations
-POPSIZE = 25  # Number of individuals per generation (population size)
-HOFSIZE = 5  # Maximum size of hall of fame (best genomes)
-
 
 def evaluation_wrapper(individual: [float], *args, **kwargs) -> [float]:
     """Custom fitness function wrapper for the
@@ -46,6 +39,13 @@ class CustomEASimple(evo_utils.BaseEAInstance):
 
         # Initializing the variable to use in the self adaptive mutation
         self.current_gen = 0
+
+        # Define some NB parameters for our EA
+        self.CXPB = 0.5  # Probability of mating two individuals
+        self.MUTPB = 0.2  # Probability of mutating an individual
+        self.NGEN = 5  # The number of generations
+        self.POPSIZE = 25  # Number of individuals per generation (population size)
+        self.HOFSIZE = 5  # Maximum size of hall of fame (best genomes)
 
         # Set directory for saving logs and experiment states
         if not os.path.exists(self.experiment_directory):
@@ -83,19 +83,19 @@ class CustomEASimple(evo_utils.BaseEAInstance):
                               )
 
         # Initialise our population
-        self.population = self.toolbox.population(n=POPSIZE)
+        self.population = self.toolbox.population(n=self.POPSIZE)
 
         # Create Hall of Fame (keeps N best individuals over all history)
-        self.hall_of_fame = tools.HallOfFame(maxsize=HOFSIZE)
+        self.hall_of_fame = tools.HallOfFame(maxsize=self.HOFSIZE)
 
         # Make a single statistics object to monitor fitness and genome stats
         self.stats = evo_utils.make_custom_statistics()
 
     def evolve(self, verbose):
         if verbose:
-            print(f"\nRunning EA for {NGEN} generations...\n")
+            print(f"\nRunning EA for {self.NGEN} generations...\n")
 
-        self.eaSimple(CXPB, MUTPB, NGEN, verbose=verbose)
+        self.eaSimple(verbose=verbose)
 
         # Get dataframe of stats
         self.stats = evo_utils.compile_stats(self.logbook)
@@ -137,7 +137,7 @@ class CustomEASimple(evo_utils.BaseEAInstance):
             **kwargs,
         )
 
-    def eaSimple(self, cxpb, mutpb, ngen, verbose=__debug__):
+    def eaSimple(self, verbose=__debug__):
         """This algorithm reproduce the simplest evolutionary algorithm as
         presented in chapter 7 of [Back2000]_.
         Retrieved from
@@ -161,13 +161,13 @@ class CustomEASimple(evo_utils.BaseEAInstance):
             print(self.logbook.stream)
 
         # Begin the generational process
-        for gen in range(1, ngen + 1):
+        for gen in range(1, self.NGEN + 1):
             self.current_gen = gen
             # Select the next generation individuals
             offspring = self.toolbox.select(self.population, len(self.population))
 
             # Vary the pool of individuals
-            offspring = algorithms.varAnd(offspring, self.toolbox, cxpb, mutpb)
+            offspring = algorithms.varAnd(offspring, self.toolbox, self.CXPB, self.MUTPB)
 
             # Evaluate the individuals with an invalid fitness
             invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
