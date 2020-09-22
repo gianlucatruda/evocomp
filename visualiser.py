@@ -10,9 +10,13 @@ sns.set()
 sns.set_style("ticks")
 sns.set_context('paper')
 
-# Set name of algorithms
+# Set name of algorithms (TODO remove)
 first_ea = "<class 'EA_demo.MyDemoEAInstance'>"
 second_ea = "<class 'EA_dummy.DummyEAInstance'>"
+
+
+def tidy_instance_name(x):
+    return x.split('.')[-1].split("'")[0]
 
 
 def format_online_results(df: pd.DataFrame):
@@ -28,6 +32,9 @@ def format_online_results(df: pd.DataFrame):
     _df.columns = _df.columns.to_series().str.join('_')
     _df.reset_index(inplace=True)
 
+    # Rename instances nicely
+    _df['ea_instance'] = _df['ea_instance'].apply(tidy_instance_name)
+
     return _df
 
 
@@ -39,8 +46,12 @@ def format_offline_results(df: pd.DataFrame):
     _df = df.copy()
 
     # Calculate statistics over all iterations
-    _df = _df.groupby(['ea_instance', 'enemy', 'individual'], as_index=False).mean()
+    _df = _df.groupby(['ea_instance', 'enemy', 'individual'],
+                      as_index=False).mean()
     _df.reset_index(inplace=True)
+
+    # Rename instances nicely
+    _df['ea_instance'] = _df['ea_instance'].apply(tidy_instance_name)
 
     return _df
 
@@ -82,16 +93,18 @@ def specialist_boxplots(df: pd.DataFrame):
     Note that you need to calculate the means of the 5 times for each solution of the algorithm for the enemy, and these means are the values that will be points in the box-plot. In summary, it is a total of 3 pairs of box-plots (so 6 boxes), being one pair per enemy.
     """
 
-    # Get
-    df.boxplot('gain', by=['enemy', 'ea_instance'])
-    degrees = 70
-    plt.xticks(rotation=degrees)
+    enemies = df['enemy'].unique()
+    n_enemies = len(enemies)
 
-    print(df)
-    plt.xticks([1, 2, 3, 4, 5, 6], [str(1) + ' ea_1', str(1) + ' ea_2', str(3) + ' ea_1',
-                                    str(3) + ' ea_2', str(5) + ' ea_1', str(5) + ' ea_2'])
+    fig, ax = plt.subplots(1, n_enemies)
+    for i, enemy in enumerate(enemies):
+        _df = df[df['enemy'] == enemy]
+        _df.boxplot(column='gain', by='ea_instance', grid=False, ax=ax[i])
+        ax[i].set_title(f'Enemy: {enemy}')
+        ax[i].set_xlabel('')
+        ax[i].tick_params(axis='x', labelrotation=90)
 
-
+    plt.tight_layout()
     plt.show()
 
 
@@ -115,7 +128,7 @@ def stat_test_t(df):
         # Perform Wilcoxon test on gain
         print("Wilcoxon test")
         w, p2 = stats.wilcoxon(x=g1['gain'], y=g2['gain'], zero_method='wilcox', correction=False,
-                              alternative='two-sided')
+                               alternative='two-sided')
         print(str(counter) + " w value is " + str(w))
         print(str(counter) + " p value is " + str(p2))
 
@@ -139,4 +152,3 @@ if __name__ == "__main__":
 
     # Significance tests
     stat_test_t(offline_summary)
-
