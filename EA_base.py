@@ -17,22 +17,20 @@ os.environ["SDL_VIDEODRIVER"] = 'dummy'
 
 N_HIDDEN_NEURONS = 10  # how many neurons in the hidden layer of the NN
 # Genotype size
-IND_SIZE = (21) * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS+1)*5
-
-# Define some NB parameters for our EA
-CXPB = 0.5  # Probability of mating two individuals
-MUTPB = 0.2  # Probability of mutating an individual
-NGEN = 5  # The number of generations
-POPSIZE = 10  # Number of individuals per generation (population size)
-HOFSIZE = 5  # Maximum size of hall of fame (best genomes)
-
-
+IND_SIZE = 21 * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS + 1) * 5
 
 
 class BaselineEAInstance(BaseEAInstance):
-    def __init__(self, experiment_directory='experiments/tmp', enemies=[2]):
+    def __init__(self, experiment_directory='experiments/tmp', enemies=[2], CXPB=0.5, MUTPB=0.2, NGEN=5, POPSIZE=10, HOFSIZE=5):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
+
+        # Define some NB parameters for our EA
+        self.CXPB = CXPB  # Probability of mating two individuals
+        self.MUTPB = MUTPB  # Probability of mutating an individual
+        self.NGEN = NGEN  # The number of generations
+        self.POPSIZE = POPSIZE  # Number of individuals per generation (population size)
+        self.HOFSIZE = HOFSIZE  # Maximum size of hall of fame (best genomes)
 
         # Set directory for saving logs and experiment states
         if not os.path.exists(self.experiment_directory):
@@ -81,10 +79,10 @@ class BaselineEAInstance(BaseEAInstance):
     def evolve(self, verbose=True):
 
         if verbose:
-            print(f"\nRunning EA for {NGEN} generations...\n")
+            print(f"\nRunning EA for {self.NGEN} generations...\n")
 
         self.final_population, self.logbook = algorithms.eaSimple(
-            self.population, self.toolbox, CXPB, MUTPB, NGEN,
+            self.population, self.toolbox, self.CXPB, self.MUTPB, self.NGEN,
             halloffame=self.hall_of_fame, stats=self.stats, verbose=verbose)
 
         # Get dataframe of stats
