@@ -12,7 +12,7 @@ import pandas as pd
 import evo_utils
 from EA_adaptive import CustomEASimple
 from EA_base import BaselineEAInstance
-
+from visualiser import inspect_evolution_stats
 
 os.putenv("SDL_VIDEODRIVER", "fbcon")
 os.environ["SDL_VIDEODRIVER"] = 'dummy'
@@ -25,6 +25,10 @@ VERBOSE = True
 base = BaselineEAInstance(enemies=ENEMIES)
 final_pop_base, stats_base, best_base = base.evolve(verbose=VERBOSE)
 
-# Testing the custom simpleEA class
+# Testing the self-adaptive EA
 ea = CustomEASimple(enemies=ENEMIES)
 final_pop_adapt, stats_adapt, best_adapt = ea.evolve(verbose=VERBOSE)
+
+# Visualise
+inspect_evolution_stats(stats_base)
+inspect_evolution_stats(stats_adapt)
