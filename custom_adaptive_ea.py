@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 
 import evo_utils
-from auxiliary_funcs import CustomEASimple
+from EA_adaptive import CustomEASimple
 from EA_demo import BaselineEAInstance
 
 
