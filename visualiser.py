@@ -134,6 +134,32 @@ def stat_test_t(df):
     return df
 
 
+def inspect_evolution_stats(df: pd.DataFrame):
+    """Produces a plot of all the stats (logbook) returned from .evolve()
+    functions (or the versions saved to .csv files).
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        Logbook statistics (output of evo_utils.compile_stats).
+    """
+
+    # Copy so that original is untouched
+    _df = df.copy()
+
+    # Make sure index has been reset
+    if 'gen' not in _df.columns:
+        _df = _df.reset_index()
+
+    fig, ax = plt.subplots(3, 1, )
+    _df.plot.line(x='gen', y='mean_fitness', yerr='std_fitness', ax=ax[0])
+    _df.plot.line(x='gen', y=['min_fitness', 'max_fitness'], ax=ax[1])
+    _df.plot.line(x='gen', y='diversity', ax=ax[2])
+
+    plt.tight_layout()
+    plt.show()
+
+
 if __name__ == "__main__":
     online_results = pd.read_csv(
         'results/09-16-19_53_05_online_results.csv')
@@ -153,3 +179,7 @@ if __name__ == "__main__":
     df_sig = stat_test_t(offline_summary)
 
     print(df_sig)
+
+    # Quick inspection of results
+    df = pd.read_csv('experiments/tmp/09-22-18_58_02_logbook.csv')
+    inspect_evolution_stats(df)
