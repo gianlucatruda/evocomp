@@ -97,7 +97,7 @@ class CustomEASimple(evo_utils.BaseEAInstance):
         # Make a single statistics object to monitor fitness and genome stats
         self.stats = evo_utils.make_custom_statistics()
 
-    def evolve(self, verbose):
+    def evolve(self, verbose=True):
         if verbose:
             print(f"\nRunning EA for {self.NGEN} generations...\n")
 
