@@ -33,7 +33,7 @@ def evaluation_wrapper(individual: [float], *args, **kwargs) -> [float]:
 
 
 class CustomEASimple(evo_utils.BaseEAInstance):
-    def __init__(self, enemies, experiment_directory='experiments/customEA_adaptive'):
+    def __init__(self, enemies=[2], experiment_directory='experiments/customEA_adaptive'):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
 
