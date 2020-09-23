@@ -21,7 +21,8 @@ def self_adaptive_mutation(individual: list, step: int) -> list:
     """
 
     idxSigma1 = int(len(individual)/2)
-    # REMARK - didn't saw a better way to initialize the sigma's to 0.8 with the underlying structure in the deap_specialist file
+    # REMARK - didn't saw a better way to initialize the sigma's to 0.8
+    # with the underlying structure in the deap_specialist file
     if step == 1:
         for i in range(idxSigma1, len(individual)):
             individual[i] = 0.8

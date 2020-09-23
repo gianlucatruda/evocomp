@@ -1,24 +1,31 @@
-import sys
-sys.path.insert(0, 'evoman')
-
-import os
 import json
+import os
 import random
+import sys
 from datetime import datetime
 
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-import evo_utils
-from simple_controller import player_controller
-from EA_demo import MyDemoEAInstance, evaluation_wrapper
+sys.path.insert(0, 'evoman')
 
-os.putenv("SDL_VIDEODRIVER", "fbcon")
-os.environ["SDL_VIDEODRIVER"] = 'dummy'
-
+OBSERVE = False  # Whether to visualise the output in realtime
 SAVEPATH = 'results'
 REPEATS = 5
+
+if not OBSERVE:
+    # Enable fast mode on some *NIX systems
+    os.putenv("SDL_VIDEODRIVER", "fbcon")
+    os.environ["SDL_VIDEODRIVER"] = 'dummy'
+    # Disable pygame load message
+    os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
+import evo_utils
+from EA_adaptive import CustomEASimple
+from EA_base import BaselineEAInstance
+from simple_controller import player_controller
+
 
 if __name__ == '__main__':
     # Read the results from the specified path
@@ -40,25 +47,33 @@ if __name__ == '__main__':
 
     print(f"\nRunning evaluations...\n")
 
-    for ea_instance in [MyDemoEAInstance, ]:
+    for ea_instance in [BaselineEAInstance, CustomEASimple]:
         print(f"\nInstance: {ea_instance}")
         for enemy in best_performers[str(ea_instance)].keys():
             print(f"\nEnemy: {enemy}")
             top_ten = best_performers[str(ea_instance)][enemy]
             # TODO could parallelise this part if needed
             for i, individual in enumerate(tqdm(top_ten, desc='individuals')):
-                for repeat in range(REPEATS):
+                if not OBSERVE:
+                    for repeat in range(REPEATS):
 
-                    # Run simulation to compute gain sore
+                        # Run simulation to compute gain sore
+                        gain = ea_instance().evaluate(
+                            individual,
+                            metric='gain')[0]
+
+                        # Save results to dictionary
+                        results['ea_instance'].append(str(ea_instance))
+                        results['enemy'].append(enemy)
+                        results['individual'].append(i)
+                        results['gain'].append(gain)
+                else:
+                    # Visually inspect performance
                     gain = ea_instance().evaluate(
                         individual,
-                        metric='gain')[0]
-
-                    # Save results to dictionary
-                    results['ea_instance'].append(str(ea_instance))
-                    results['enemy'].append(enemy)
-                    results['individual'].append(i)
-                    results['gain'].append(gain)
+                        metric='gain',
+                        speed="normal")[0]
+                    print("Gain:", gain)
 
 # Turn results into a dataframe
 df_results = pd.DataFrame(results)

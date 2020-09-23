@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 from scipy import stats
 
+DPI = 200
 
 # Set sensible defaults
 sns.set()
@@ -64,17 +65,23 @@ def specialist_lineplots(df: pd.DataFrame):
     # Get neat versions of the instance names
     instances = df['ea_instance'].unique()
 
-    fig, ax = plt.subplots(n_enemies, 1,)
+    fig, ax = plt.subplots(n_enemies, 1, dpi=DPI)
+    colours = ['blue', 'red']
 
     for i, enemy in enumerate(enemies):
-        for instance in instances:
-            _df = df[df['enemy'] == enemy]
+        for j, instance in enumerate(instances):
+            colour = colours[j]
+            _df = df[(df['enemy'] == enemy) & (df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='mean_fitness_mean', yerr='mean_fitness_std',
-                          ax=ax[i], label=f'{instance} mean fitness')
+                          ax=ax[i], c=colour, label=f'{instance} mean fitness')
             _df.plot.line(x='gen', y='max_fitness_mean', yerr='max_fitness_std',
-                          ax=ax[i], label=f'{instance} max fitness')
+                          ax=ax[i], c=colour, linestyle='--', label=f'{instance} max fitness')
             ax[i].set_title(f'Enemy: {enemy}')
             ax[i].set_xlabel('')
+            handles, labels = ax[i].get_legend_handles_labels()
+            ax[i].get_legend().remove()
+
+    fig.legend(handles, labels, loc='lower right')
 
     plt.xlabel('Generation')
     plt.ylabel('Fitness score')
@@ -91,14 +98,15 @@ def specialist_boxplots(df: pd.DataFrame):
     enemies = df['enemy'].unique()
     n_enemies = len(enemies)
 
-    fig, ax = plt.subplots(1, n_enemies)
+    fig, ax = plt.subplots(1, n_enemies, dpi=DPI)
     for i, enemy in enumerate(enemies):
         _df = df[df['enemy'] == enemy]
         _df.boxplot(column='gain', by='ea_instance', grid=False, ax=ax[i])
         ax[i].set_title(f'Enemy: {enemy}')
+        ax[i].set_ylabel('Gain score')
         ax[i].set_xlabel('')
         ax[i].tick_params(axis='x', labelrotation=90)
-
+    fig.suptitle('')
     plt.tight_layout()
     plt.show()
 
@@ -120,9 +128,8 @@ def stat_test_t(df):
         gains2 = df[(df['ea_instance'] == ea2) & (
             df['enemy'] == enemy)]['gain'].values
 
-        # Perform wilcoxon for that enemy
-        w, p = stats.wilcoxon(x=gains1, y=gains2, zero_method='wilcox',
-                              correction=False, alternative='two-sided')
+        # Perform independent t-test for that enemy
+        w, p = stats.ttest_ind(gains1, gains2)
 
         # Save results to dictionary of lists
         stats_results['enemy'].append(enemy)
@@ -151,7 +158,7 @@ def inspect_evolution_stats(df: pd.DataFrame):
     if 'gen' not in _df.columns:
         _df = _df.reset_index()
 
-    fig, ax = plt.subplots(3, 1, )
+    fig, ax = plt.subplots(3, 1, dpi=DPI)
     _df.plot.line(x='gen', y='mean_fitness', yerr='std_fitness', ax=ax[0])
     _df.plot.line(x='gen', y=['min_fitness', 'max_fitness'], ax=ax[1])
     _df.plot.line(x='gen', y='diversity', ax=ax[2])
@@ -162,8 +169,9 @@ def inspect_evolution_stats(df: pd.DataFrame):
 
 if __name__ == "__main__":
     online_results = pd.read_csv(
-        'results/09-16-19_53_05_online_results.csv')
-    offline_results = pd.read_csv('dummy_offline_results.csv')
+        'results/09-22-21_51_13_online_results.csv')
+    offline_results = pd.read_csv(
+        'results/09-23-12_01_38_offline_results.csv')
 
     # Format the data and calculate statistics
     online_summary = format_online_results(online_results)
@@ -178,7 +186,8 @@ if __name__ == "__main__":
     # Significance tests
     df_sig = stat_test_t(offline_summary)
 
-    print(df_sig)
+    print(df_sig, end='\n\n\n')
+    print(df_sig.to_latex(index=False))
 
     # Quick inspection of results
     df = pd.read_csv('experiments/tmp/09-22-18_58_02_logbook.csv')
