@@ -128,9 +128,8 @@ def stat_test_t(df):
         gains2 = df[(df['ea_instance'] == ea2) & (
             df['enemy'] == enemy)]['gain'].values
 
-        # Perform wilcoxon for that enemy
-        w, p = stats.wilcoxon(x=gains1, y=gains2, zero_method='wilcox',
-                              correction=False, alternative='two-sided')
+        # Perform independent t-test for that enemy
+        w, p = stats.ttest_ind(gains1, gains2)
 
         # Save results to dictionary of lists
         stats_results['enemy'].append(enemy)
