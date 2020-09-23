@@ -2,6 +2,12 @@ import sys
 sys.path.insert(0, 'evoman')
 
 import os
+# Enable fast mode on some *NIX systems
+os.putenv("SDL_VIDEODRIVER", "fbcon")
+os.environ["SDL_VIDEODRIVER"] = 'dummy'
+# Disable pygame load message
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
 import json
 import random
 from datetime import datetime
@@ -16,8 +22,6 @@ from EA_adaptive import CustomEASimple
 from joblib import Parallel, delayed
 import multiprocessing
 
-os.putenv("SDL_VIDEODRIVER", "fbcon")
-os.environ["SDL_VIDEODRIVER"] = 'dummy'
 
 SAVEPATH = 'results'
 ENEMIES = [1, 3, 5]
@@ -51,10 +55,11 @@ results = []
 
 
 for ea_instance in [BaselineEAInstance, CustomEASimple]:
+    print(f"\nInstance: {ea_instance}")
     # Instantiate nested dictionary for this instance
     best_performers[str(ea_instance)] = {e: [] for e in ENEMIES}
     for enemy in ENEMIES:
-
+        print(f"\nEnemy: {enemy}")
         # Parallel execution of `evolve_island` function for N repeats
         island_results = Parallel(n_jobs=JOBS)(
             delayed(evolve_island)(ea_instance, enemy) for repeat in range(REPEATS))

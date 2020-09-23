@@ -2,6 +2,12 @@ import sys
 sys.path.insert(0, 'evoman')
 
 import os
+# Enable fast mode on some *NIX systems
+os.putenv("SDL_VIDEODRIVER", "fbcon")
+os.environ["SDL_VIDEODRIVER"] = 'dummy'
+# Disable pygame load message
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
 import json
 import random
 from datetime import datetime
@@ -14,9 +20,6 @@ import evo_utils
 from simple_controller import player_controller
 from EA_base import BaselineEAInstance
 from EA_adaptive import CustomEASimple
-
-os.putenv("SDL_VIDEODRIVER", "fbcon")
-os.environ["SDL_VIDEODRIVER"] = 'dummy'
 
 SAVEPATH = 'results'
 REPEATS = 5
