@@ -77,6 +77,10 @@ def specialist_lineplots(df: pd.DataFrame):
                           ax=ax[i], c=colour, linestyle='--', label=f'{instance} max fitness')
             ax[i].set_title(f'Enemy: {enemy}')
             ax[i].set_xlabel('')
+            handles, labels = ax[i].get_legend_handles_labels()
+            ax[i].get_legend().remove()
+
+    fig.legend(handles, labels, loc='lower right')
 
     plt.xlabel('Generation')
     plt.ylabel('Fitness score')
@@ -182,7 +186,8 @@ if __name__ == "__main__":
     # Significance tests
     df_sig = stat_test_t(offline_summary)
 
-    print(df_sig)
+    print(df_sig, end='\n\n\n')
+    print(df_sig.to_latex(index=False))
 
     # Quick inspection of results
     df = pd.read_csv('experiments/tmp/09-22-18_58_02_logbook.csv')
