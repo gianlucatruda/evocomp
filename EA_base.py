@@ -102,3 +102,25 @@ class BaselineEAInstance(BaseEAInstance):
 
         return self.final_population, self.stats, self.best_individuals
 
+    def evaluate(self, individual: [float], *args, **kwargs) -> [float]:
+        """Runs the evaluation process for this EA on the specified individual.
+
+        Parameters
+        ----------
+        individual : list
+            The genome of the individual to evaluate.
+
+        Returns
+        -------
+        [float]
+            The fitness score (or gain score) wrapped in a list.
+        """
+
+        return evo_utils.evaluate(
+            individual,
+            experiment_name=self.experiment_directory,
+            player_controller=self.player_controller,
+            enemies=self.enemies,
+            *args,
+            **kwargs,
+        )
