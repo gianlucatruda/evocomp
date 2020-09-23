@@ -43,8 +43,18 @@ for ea_instance in [BaselineEAInstance, CustomEASimple]:
     for enemy in ENEMIES:
         print(f"\nEnemy: {enemy}")
         for repeat in tqdm(range(REPEATS), desc='Repeats'):
-            stats, best_fitness, top_genome = ea_instance(
+
+            pop, stats, bests = ea_instance(
                 enemies=[enemy]).evolve(verbose=VERBOSE)
+
+            # Save the stats (fitness and genome)
+            stats['enemy'] = enemy
+            stats['ea_instance'] = str(ea_instance)
+
+            # Store the best genome
+            best_fitness = np.max(list(bests.keys()))
+            top_genome = bests[best_fitness]
+
             best_performers[str(ea_instance)][enemy].append(top_genome)
             results.append(stats)
 
@@ -65,14 +75,3 @@ with open(f"{SAVEPATH}/{now}_best_genomes.json", 'w') as file:
 
 def evolve_island(ea_instance, enemy):
     raise DeprecationWarning("Parallelisation is unreliable.")
-    pop, stats, bests = ea_instance(enemies=[enemy]).evolve(verbose=VERBOSE)
-
-    # Save the stats (fitness and genome)
-    stats['enemy'] = enemy
-    stats['ea_instance'] = str(ea_instance)
-
-    # Store the best genome
-    best_fitness = np.max(list(bests.keys()))
-    top_genome = bests[best_fitness]
-
-    return stats, best_fitness, top_genome
