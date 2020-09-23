@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 from scipy import stats
 
+DPI = 200
 
 # Set sensible defaults
 sns.set()
@@ -64,7 +65,7 @@ def specialist_lineplots(df: pd.DataFrame):
     # Get neat versions of the instance names
     instances = df['ea_instance'].unique()
 
-    fig, ax = plt.subplots(n_enemies, 1,)
+    fig, ax = plt.subplots(n_enemies, 1, dpi=DPI)
     colours = ['blue', 'red']
 
     for i, enemy in enumerate(enemies):
@@ -97,7 +98,7 @@ def specialist_boxplots(df: pd.DataFrame):
     enemies = df['enemy'].unique()
     n_enemies = len(enemies)
 
-    fig, ax = plt.subplots(1, n_enemies)
+    fig, ax = plt.subplots(1, n_enemies, dpi=DPI)
     for i, enemy in enumerate(enemies):
         _df = df[df['enemy'] == enemy]
         _df.boxplot(column='gain', by='ea_instance', grid=False, ax=ax[i])
@@ -158,7 +159,7 @@ def inspect_evolution_stats(df: pd.DataFrame):
     if 'gen' not in _df.columns:
         _df = _df.reset_index()
 
-    fig, ax = plt.subplots(3, 1, )
+    fig, ax = plt.subplots(3, 1, dpi=DPI)
     _df.plot.line(x='gen', y='mean_fitness', yerr='std_fitness', ax=ax[0])
     _df.plot.line(x='gen', y=['min_fitness', 'max_fitness'], ax=ax[1])
     _df.plot.line(x='gen', y='diversity', ax=ax[2])
