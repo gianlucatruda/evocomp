@@ -51,7 +51,7 @@ def evaluate(individual: list,
         enemymode="static",
         player_controller=player_controller,
         level=2,
-        speed=speed, #"normal",
+        speed=speed,  # "normal",
         inputscoded="no",            # yes or no
         randomini="no",              # yes or no
         sound="off",                 # on or off
@@ -76,7 +76,7 @@ def evaluate(individual: list,
 
 def diversity_L1(pop: list) -> float:
     """Calculate mean Manhattan (L1) distance between every pair
-    of genomes in the population.
+    of genomes in the population, divided by mean genome size.
 
     Parameters
     ----------
@@ -86,10 +86,12 @@ def diversity_L1(pop: list) -> float:
     Returns
     -------
     float
-        The mean mutual Manhattan distance
+        The mean mutual Manhattan distance (scaled by genome size)
     """
     dists = [distance.cityblock(i, j) for i in pop for j in pop if i != j]
-    return np.mean(dists)
+    mean_genome_size = np.mean([len(i) for i in pop])
+
+    return np.mean(dists) / mean_genome_size
 
 
 def make_custom_statistics() -> tools.MultiStatistics:
