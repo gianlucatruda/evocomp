@@ -19,7 +19,7 @@ IND_SIZE = 21 * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS + 1) * 5
 
 
 class BaselineEAInstance(BaseEAInstance):
-    def __init__(self, experiment_directory='experiments/tmp', enemies=[2], CXPB=0.5, MUTPB=0.3, NGEN=5, POPSIZE=10, HOFSIZE=5):
+    def __init__(self, experiment_directory='experiments/tmp', enemies=[2], CXPB=0.5, MUTPB=0.3, NGEN=10, POPSIZE=30, HOFSIZE=5):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
 
@@ -53,7 +53,7 @@ class BaselineEAInstance(BaseEAInstance):
             "population", tools.initRepeat, list, self.toolbox.individual)
 
         # We set our operators
-        self.toolbox.register("mate", tools.cxUniform, indpb=CXPB)
+        self.toolbox.register("mate", tools.cxUniform, indpb=0.5)
         self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=MUTPB)
         self.toolbox.register("select", tools.selTournament, tournsize=3)
 

@@ -46,8 +46,8 @@ class CustomEASimple(evo_utils.BaseEAInstance):
         # Define some NB parameters for our EA
         self.CXPB = 0.7  # Probability of mating two individuals
         self.MUTPB = 0.3  # Probability of mutating an individual
-        self.NGEN = 50  # The number of generations
-        self.POPSIZE = 100  # Number of individuals per generation (population size)
+        self.NGEN = 10  # The number of generations
+        self.POPSIZE = 30  # Number of individuals per generation (population size)
         self.HOFSIZE = 5  # Maximum size of hall of fame (best genomes)
 
         self.parentSelCons = 0.6 # The best 60 % of individuals is selected to mate
@@ -75,7 +75,7 @@ class CustomEASimple(evo_utils.BaseEAInstance):
         self.toolbox.register("population", tools.initRepeat, list, self.toolbox.individual)
 
         # We set our operators
-        self.toolbox.register("mate", tools.cxUniform, indpb=0.3)
+        self.toolbox.register("mate", tools.cxUniform, indpb=0.5)
         self.toolbox.register("mutate", self_adaptive_mutation,
                         step=CallbackProxy(lambda: self.current_gen))
         self.toolbox.register("select", tools.selTournament, tournsize=3)
