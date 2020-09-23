@@ -1,25 +1,26 @@
-import sys
-sys.path.insert(0, 'evoman')
-
-import os
-# Enable fast mode on some *NIX systems
-os.putenv("SDL_VIDEODRIVER", "fbcon")
-os.environ["SDL_VIDEODRIVER"] = 'dummy'
-# Disable pygame load message
-os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
-
 import json
+import os
 import random
+import sys
 from datetime import datetime
 
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
+sys.path.insert(0, 'evoman')
+
+# Enable fast mode on some *NIX systems
+os.putenv("SDL_VIDEODRIVER", "fbcon")
+os.environ["SDL_VIDEODRIVER"] = 'dummy'
+# Disable pygame load message
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
+
 import evo_utils
-from simple_controller import player_controller
-from EA_base import BaselineEAInstance
 from EA_adaptive import CustomEASimple
+from EA_base import BaselineEAInstance
+from simple_controller import player_controller
+
 
 SAVEPATH = 'results'
 REPEATS = 5

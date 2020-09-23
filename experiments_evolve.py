@@ -1,25 +1,24 @@
-import sys
-sys.path.insert(0, 'evoman')
-
+import json
 import os
+import random
+import sys
+from datetime import datetime
+
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+
 # Enable fast mode on some *NIX systems
 os.putenv("SDL_VIDEODRIVER", "fbcon")
 os.environ["SDL_VIDEODRIVER"] = 'dummy'
 # Disable pygame load message
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
-import json
-import random
-from datetime import datetime
-
-import numpy as np
-import pandas as pd
-
 import evo_utils
-from EA_base import BaselineEAInstance
 from EA_adaptive import CustomEASimple
+from EA_base import BaselineEAInstance
 
-from tqdm import tqdm
+sys.path.insert(0, 'evoman')
 
 SAVEPATH = 'results'
 ENEMIES = [1, 3, 5]
