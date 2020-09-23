@@ -12,8 +12,6 @@ import evo_utils
 from evo_utils import BaseEAInstance
 from simple_controller import player_controller
 
-os.putenv("SDL_VIDEODRIVER", "fbcon")
-os.environ["SDL_VIDEODRIVER"] = 'dummy'
 
 N_HIDDEN_NEURONS = 10  # how many neurons in the hidden layer of the NN
 # Genotype size
@@ -21,7 +19,7 @@ IND_SIZE = 21 * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS + 1) * 5
 
 
 class BaselineEAInstance(BaseEAInstance):
-    def __init__(self, experiment_directory='experiments/tmp', enemies=[2], CXPB=0.5, MUTPB=0.2, NGEN=5, POPSIZE=10, HOFSIZE=5):
+    def __init__(self, experiment_directory='experiments/tmp', enemies=[2], CXPB=0.5, MUTPB=0.3, NGEN=5, POPSIZE=10, HOFSIZE=5):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
 

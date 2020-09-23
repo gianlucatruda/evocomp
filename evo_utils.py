@@ -17,7 +17,7 @@ def evaluate(individual: list,
              player_controller: Controller,
              experiment_name='experiments/tmp',
              enemies=[2],
-             metric='fitness') -> list:
+             metric='fitness', speed='fastest') -> list:
     """Custom evaluation function based on evoman specialist (NN)
 
     Parameters
@@ -51,7 +51,7 @@ def evaluate(individual: list,
         enemymode="static",
         player_controller=player_controller,
         level=2,
-        speed="fastest",
+        speed=speed, #"normal",
         inputscoded="no",            # yes or no
         randomini="no",              # yes or no
         sound="off",                 # on or off
