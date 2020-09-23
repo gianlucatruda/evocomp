@@ -65,14 +65,16 @@ def specialist_lineplots(df: pd.DataFrame):
     instances = df['ea_instance'].unique()
 
     fig, ax = plt.subplots(n_enemies, 1,)
+    colours = ['blue', 'red']
 
     for i, enemy in enumerate(enemies):
-        for instance in instances:
-            _df = df[df['enemy'] == enemy]
+        for j, instance in enumerate(instances):
+            colour = colours[j]
+            _df = df[(df['enemy'] == enemy) & (df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='mean_fitness_mean', yerr='mean_fitness_std',
-                          ax=ax[i], label=f'{instance} mean fitness')
+                          ax=ax[i], c=colour, label=f'{instance} mean fitness')
             _df.plot.line(x='gen', y='max_fitness_mean', yerr='max_fitness_std',
-                          ax=ax[i], label=f'{instance} max fitness')
+                          ax=ax[i], c=colour, linestyle='--', label=f'{instance} max fitness')
             ax[i].set_title(f'Enemy: {enemy}')
             ax[i].set_xlabel('')
 
@@ -96,9 +98,10 @@ def specialist_boxplots(df: pd.DataFrame):
         _df = df[df['enemy'] == enemy]
         _df.boxplot(column='gain', by='ea_instance', grid=False, ax=ax[i])
         ax[i].set_title(f'Enemy: {enemy}')
+        ax[i].set_ylabel('Gain score')
         ax[i].set_xlabel('')
         ax[i].tick_params(axis='x', labelrotation=90)
-
+    fig.suptitle('')
     plt.tight_layout()
     plt.show()
 
@@ -162,8 +165,9 @@ def inspect_evolution_stats(df: pd.DataFrame):
 
 if __name__ == "__main__":
     online_results = pd.read_csv(
-        'results/09-16-19_53_05_online_results.csv')
-    offline_results = pd.read_csv('dummy_offline_results.csv')
+        'results/09-22-21_51_13_online_results.csv')
+    offline_results = pd.read_csv(
+        'results/09-23-12_01_38_offline_results.csv')
 
     # Format the data and calculate statistics
     online_summary = format_online_results(online_results)
