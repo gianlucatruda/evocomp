@@ -189,7 +189,7 @@ class CustomEASimple(evo_utils.BaseEAInstance):
             if (self.POPSIZE + len(offspring)) > int(self.POPSIZE*(1 + self.survivorSelCons)):
                 worst = tools.selWorst(offspring, k=ceil((len(offspring) * self.survivorSelCons)))
                 for w in worst:
-                    print(w.fitness.values)
+                    # print(w.fitness.values)
                     offspring.remove(w)
 
             # Update the hall of fame with the generated individuals
