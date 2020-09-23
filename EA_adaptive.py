@@ -3,6 +3,9 @@ sys.path.insert(0, 'evoman')
 import os
 import json
 
+from math import ceil
+import numpy as np
+from operator import attrgetter
 import random
 from datetime import datetime
 from deap import algorithms, base, creator, tools
@@ -41,11 +44,14 @@ class CustomEASimple(evo_utils.BaseEAInstance):
         self.current_gen = 0
 
         # Define some NB parameters for our EA
-        self.CXPB = 0.5  # Probability of mating two individuals
-        self.MUTPB = 0.2  # Probability of mutating an individual
-        self.NGEN = 5  # The number of generations
-        self.POPSIZE = 25  # Number of individuals per generation (population size)
+        self.CXPB = 0.7  # Probability of mating two individuals
+        self.MUTPB = 0.3  # Probability of mutating an individual
+        self.NGEN = 50  # The number of generations
+        self.POPSIZE = 100  # Number of individuals per generation (population size)
         self.HOFSIZE = 5  # Maximum size of hall of fame (best genomes)
+
+        self.parentSelCons = 0.6 # The best 60 % of individuals is selected to mate
+        self.survivorSelCons = 0.05 # The worst 5 % of individuals to replace for the next generation
 
         # Set directory for saving logs and experiment states
         if not os.path.exists(self.experiment_directory):
@@ -164,10 +170,14 @@ class CustomEASimple(evo_utils.BaseEAInstance):
         for gen in range(1, self.NGEN + 1):
             self.current_gen = gen
             # Select the next generation individuals
-            offspring = self.toolbox.select(self.population, len(self.population))
+            offspring = self.toolbox.select(self.population, self.POPSIZE)
+
+            # Simple Parent Selection Mechanism
+            parents = tools.selBest(offspring, k=int(len(offspring)*self.parentSelCons))
+            #parents2 = self.selBest(offspring, k=int(len(offspring)*self.parentSelCons), fit_attr=fitnesses)
 
             # Vary the pool of individuals
-            offspring = algorithms.varAnd(offspring, self.toolbox, self.CXPB, self.MUTPB)
+            offspring = algorithms.varAnd(parents, self.toolbox, self.CXPB, self.MUTPB)
 
             # Evaluate the individuals with an invalid fitness
             invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
@@ -175,12 +185,19 @@ class CustomEASimple(evo_utils.BaseEAInstance):
             for ind, fit in zip(invalid_ind, fitnesses):
                 ind.fitness.values = fit
 
+            # Simple Survivor Selection Mechanism
+            if (self.POPSIZE + len(offspring)) > int(self.POPSIZE*(1 + self.survivorSelCons)):
+                worst = tools.selWorst(offspring, k=ceil((len(offspring) * self.survivorSelCons)))
+                for w in worst:
+                    print(w.fitness.values)
+                    offspring.remove(w)
+
             # Update the hall of fame with the generated individuals
             if self.hall_of_fame is not None:
                 self.hall_of_fame.update(offspring)
 
             # Replace the current population by the offspring
-            self.population[:] = offspring
+            self.population[len(self.population):] = offspring
 
             # Append the current generation statistics to the logbook
             record = self.stats.compile(self.population) if self.stats else {}
@@ -189,3 +206,25 @@ class CustomEASimple(evo_utils.BaseEAInstance):
                 print(self.logbook.stream)
 
         self.final_population = self.population
+
+    def selBest(self, individuals, k, fit_attr):
+        """ Optimized version of
+        https://github.com/DEAP/deap/blob/38083e5923274dfe5ecc0586eb295228f8c99fc4/deap/tools/selection.py#L27
+        """
+        indivs = np.array(individuals)
+        print(type(fit_attr), fit_attr)
+        """
+        # Evaluate the individuals with an invalid fitness
+        #invalid_ind = [ind for ind in offspring if not ind.fitness.valid]
+        fitnesses = np.array([0 for i in range(indivs.shape[0])])
+        for ind, fit in zip(fitnesses, fit_attr):
+            print(ind, fit)
+            fitnesses[ind] = fit
+        #fitnesses = [ind=fit for ind, fit in map(fitnesses, fit_attr)]
+        print(type(fitnesses), fitnesses)
+        ind = np.argsort(fitnesses)
+        print(indivs.shape, ind.shape)
+        indivs = np.take_along_axis(indivs, ind, axis=0)  # same as np.sort(x, axis=0)
+        best = indivs[:k]
+        return best.tolist()
+        """
