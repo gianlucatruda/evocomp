@@ -58,7 +58,7 @@ if __name__ == '__main__':
                     for repeat in range(REPEATS):
 
                         # Run simulation to compute gain sore
-                        gain = ea_instance().evaluate(
+                        gain = ea_instance(enemies=enemy).evaluate(
                             individual,
                             metric='gain')[0]
 
@@ -69,7 +69,7 @@ if __name__ == '__main__':
                         results['gain'].append(gain)
                 else:
                     # Visually inspect performance
-                    gain = ea_instance().evaluate(
+                    gain = ea_instance(enemies=enemy).evaluate(
                         individual,
                         metric='gain',
                         speed="normal")[0]
