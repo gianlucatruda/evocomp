@@ -2,6 +2,7 @@ import sys
 sys.path.insert(0, 'evoman')
 import os
 from abc import ABC
+import json
 
 import numpy as np
 import pandas as pd
@@ -174,6 +175,39 @@ def compile_best_individuals(hall_of_fame: tools.HallOfFame) -> dict:
         best_individuals[key.values[0]] = item
 
     return best_individuals
+
+
+def diversity_comparison(genomes_path: str) -> pd.DataFrame:
+    """Generates table comparing diversity amongst best genomes
+    for each enemy and EA instance.
+
+    Parameters
+    ----------
+    genomes_path : str
+        Path to JSON file containing results from experiment run.
+
+    Returns
+    -------
+    pd.DataFrame
+        Pivoted results comparing diversity, with one EA per column.
+    """
+    with open(genomes_path, 'r') as file:
+        genomes = json.load(file)
+
+    res = {'Instance': [], 'Enemy': [], 'Diversity': []}
+
+    for instance in genomes.keys():
+        inst = genomes[instance]
+        for enemy in inst.keys():
+            top10 = inst[enemy]
+            res['Instance'].append(instance)
+            res['Enemy'].append(enemy)
+            res['Diversity'].append(diversity_L1(top10))
+
+    df = pd.DataFrame(res)
+    df = df.pivot(index='Enemy', columns='Instance', values='Diversity')
+
+    return df
 
 
 class BaseEAInstance(ABC):

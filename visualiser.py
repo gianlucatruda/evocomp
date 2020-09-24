@@ -5,6 +5,8 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 from scipy import stats
 
+from evo_utils import diversity_comparison
+
 SAVE_DPI = 300
 
 if not os.path.exists('figs'):
@@ -236,6 +238,13 @@ if __name__ == "__main__":
 
     print(df_sig, end='\n\n\n')
     print(df_sig.to_latex(index=False))
+
+    # Diversity comparisons
+    df_div = diversity_comparison(
+        'results/andre/09-24-03_54_12_best_genomes.json')
+    df_div.columns = [tidy_instance_name(x) for x in df_div.columns]
+    print(df_div, end='\n\n\n')
+    print(df_div.to_latex())
 
     # Quick inspection of results
     # df = pd.read_csv('experiments/tmp/09-22-18_58_02_logbook.csv')
