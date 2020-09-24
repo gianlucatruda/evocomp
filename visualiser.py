@@ -73,9 +73,9 @@ def specialist_lineplots(df: pd.DataFrame):
             colour = colours[j]
             _df = df[(df['enemy'] == enemy) & (df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='mean_fitness_mean', yerr='mean_fitness_std',
-                          ax=ax[i], c=colour, label=f'{instance} mean fitness')
+                          ax=ax[i], c=colour, label=f'{instance} mean fitness', alpha=0.7, markersize=5, capsize=2)
             _df.plot.line(x='gen', y='max_fitness_mean', yerr='max_fitness_std',
-                          ax=ax[i], c=colour, linestyle='--', label=f'{instance} max fitness')
+                          ax=ax[i], c=colour, linestyle='--', label=f'{instance} max fitness', alpha=0.7, markersize=5, capsize=2)
             ax[i].set_title(f'Enemy: {enemy}')
             ax[i].set_xlabel('')
             handles, labels = ax[i].get_legend_handles_labels()
@@ -158,8 +158,8 @@ def diversity_compare(df: pd.DataFrame):
         for j, instance in enumerate(instances):
             colour = colours[j]
             _df = df[(df['enemy'] == enemy) & (df['ea_instance'] == instance)]
-            _df.plot.line(x='gen', y='diversity_mean', yerr='diversity_std',
-                          ax=ax[i], c=colour, label=f'{instance} diversity')
+            _df.plot.line(x='gen', y='diversity_mean', yerr='diversity_std', fmt='.-',
+                          ax=ax[i], c=colour, label=f'{instance} diversity', alpha=0.7, markersize=5, capsize=2)
             ax[i].set_title(f'Enemy: {enemy}')
             ax[i].set_xlabel('')
             handles, labels = ax[i].get_legend_handles_labels()
@@ -211,6 +211,7 @@ if __name__ == "__main__":
 
     # Specialist lineplots
     specialist_lineplots(online_summary)
+    diversity_compare(online_summary)
 
     # Specialist boxplots
     specialist_boxplots(offline_summary)
