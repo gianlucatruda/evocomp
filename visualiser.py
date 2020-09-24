@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import seaborn as sns
 from scipy import stats
 
-DPI = 200
+DPI = 100
 
 # Set sensible defaults
 sns.set()
@@ -139,6 +139,38 @@ def stat_test_t(df):
     # Make dataframe of significance results
     df = pd.DataFrame(stats_results)
     return df
+
+
+def diversity_compare(df: pd.DataFrame):
+    """ Compares relative diversity measures (online stats) for multiple EAs
+    across enemies.
+    """
+
+    enemies = df['enemy'].unique()
+    n_enemies = len(enemies)
+    # Get neat versions of the instance names
+    instances = df['ea_instance'].unique()
+
+    fig, ax = plt.subplots(n_enemies, 1, dpi=DPI)
+    colours = ['blue', 'red']
+
+    for i, enemy in enumerate(enemies):
+        for j, instance in enumerate(instances):
+            colour = colours[j]
+            _df = df[(df['enemy'] == enemy) & (df['ea_instance'] == instance)]
+            _df.plot.line(x='gen', y='diversity_mean', yerr='diversity_std',
+                          ax=ax[i], c=colour, label=f'{instance} diversity')
+            ax[i].set_title(f'Enemy: {enemy}')
+            ax[i].set_xlabel('')
+            handles, labels = ax[i].get_legend_handles_labels()
+            ax[i].get_legend().remove()
+
+    fig.legend(handles, labels, loc='lower right')
+
+    plt.xlabel('Generation')
+    plt.ylabel('Relative population diversity')
+    plt.tight_layout()
+    plt.show()
 
 
 def inspect_evolution_stats(df: pd.DataFrame):
