@@ -77,7 +77,8 @@ def specialist_lineplots(df: pd.DataFrame, save_path=None):
     for i, enemy in enumerate(enemies):
         for j, instance in enumerate(instances):
             colour = colours[j]
-            _df = df[(df['enemies'] == enemy) & (df['ea_instance'] == instance)]
+            _df = df[(df['enemies'] == enemy) & (
+                df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='mean_fitness_mean', yerr='mean_fitness_std',
                           ax=ax[i], c=colour, label=f'{instance} mean fitness', alpha=0.7, markersize=5, capsize=2)
             _df.plot.line(x='gen', y='max_fitness_mean', yerr='max_fitness_std',
@@ -137,7 +138,8 @@ def diversity_compare(df: pd.DataFrame, save_path=None):
     for i, enemy in enumerate(enemies):
         for j, instance in enumerate(instances):
             colour = colours[j]
-            _df = df[(df['enemies'] == enemy) & (df['ea_instance'] == instance)]
+            _df = df[(df['enemies'] == enemy) & (
+                df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='diversity_mean', yerr='diversity_std', fmt='.-',
                           ax=ax[i], c=colour, label=f'{instance} diversity', alpha=0.7, markersize=5, capsize=2)
             ax[i].set_title(f'Enemies: {enemy}')

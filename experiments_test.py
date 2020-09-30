@@ -59,10 +59,10 @@ if __name__ == '__main__':
 
             # Determine if specialist or generalist based on enemies
             if isinstance(_enemies, int):
-                multi="no"
+                multi = "no"
                 _enemies = [_enemies]
             else:
-                multi="yes"
+                multi = "yes"
 
             print(f"\nEnemies: {enemies}")
             top_ten = best_performers[str(ea_instance)][enemies]
