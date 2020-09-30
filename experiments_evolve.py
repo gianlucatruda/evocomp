@@ -27,10 +27,7 @@ VERBOSE = False
 INSTANCES = [BaselineEAInstance]
 
 # Automatically infers specialist or generalist from ENEMIES nesting
-if any(isinstance(i, list) for i in ENEMIES):
-    multi = "yes"
-else:
-    multi = "no"
+multi = "yes" if any(isinstance(i, list) for i in ENEMIES) else "no"
 
 # Make sure savepath exists
 if not os.path.exists(SAVEPATH):
@@ -51,7 +48,7 @@ for ea_instance in INSTANCES:
         if multi == "yes":
             _enemies = enemies
         print(f"\nEnemies: {_enemies}")
-        for repeat in tqdm(range(REPEATS), desc='Repeats'):
+        for _ in tqdm(range(REPEATS), desc='Repeats'):
             pop, stats, bests = ea_instance(
                 enemies=_enemies,
                 multiplemode=multi).evolve(verbose=VERBOSE)
