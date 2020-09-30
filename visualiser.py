@@ -215,15 +215,16 @@ def stat_test_t(df):
 
 if __name__ == "__main__":
     online_results = pd.read_csv(
-        'results/09-30-12_48_51_online_results.csv')
+        'results/09-30-13_32_18_online_results.csv')
     offline_results = pd.read_csv(
-        'results/09-30-13_02_49_offline_results.csv')
+        'results/09-30-14_07_49_offline_results.csv')
 
     # Format the data and calculate statistics
     online_summary = format_online_results(online_results)
-    print(online_summary.groupby(['ea_instance', 'enemies']).mean())
+    print('\nOnline results', online_summary.groupby(
+        ['ea_instance', 'enemies']).mean(), sep='\n', end='\n\n')
+
     offline_summary = format_offline_results(offline_results)
-    print(offline_summary.groupby(['ea_instance', 'enemies']).mean())
 
     # Specialist lineplots
     specialist_lineplots(
@@ -236,15 +237,27 @@ if __name__ == "__main__":
     # Significance tests
     df_sig = stat_test_t(offline_summary)
 
-    print(df_sig, end='\n\n\n')
-    print(df_sig.to_latex(index=False))
+    # Combine offline with significance
+    df_offline = offline_summary[['ea_instance', 'enemies', 'gain']].groupby(
+        ['ea_instance', 'enemies']).mean().reset_index()
+    df_offline = df_offline.pivot(
+        index='enemies', columns='ea_instance', values='gain')
+
+    df_offline = df_offline.merge(df_sig, on='enemies')
+    df_offline = df_offline.round(4)
+    print("\nOffline results", df_offline, sep='\n', end='\n\n')
+    print(df_offline.to_latex(index=False))
 
     # Diversity comparisons
     df_div = diversity_comparison(
-        'results/09-30-12_48_51_best_genomes.json')
+        'results/09-30-13_32_18_best_genomes.json')
+
+    # Clean up names and ordering in dataframe
     df_div.columns = [tidy_instance_name(x) for x in df_div.columns]
-    print(df_div, end='\n\n\n')
-    print(df_div.to_latex())
+    # df_div = df_div[sorted([c for c in df_div.columns])]
+    df_div.reset_index(inplace=True)
+    print("\nDiversity results", df_div, sep='\n', end='\n\n\n')
+    print(df_div.to_latex(index=False))
 
     # Quick inspection of results
     df = pd.read_csv('experiments/tmp/09-30-12_48_51_logbook.csv')
