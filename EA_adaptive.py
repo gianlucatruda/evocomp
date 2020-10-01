@@ -36,9 +36,10 @@ def evaluation_wrapper(individual: [float], *args, **kwargs) -> [float]:
 
 
 class CustomEASimple(evo_utils.BaseEAInstance):
-    def __init__(self, enemies=[2], experiment_directory='experiments/customEA_adaptive'):
+    def __init__(self, enemies=[2], multiplemode="no", experiment_directory='experiments/customEA_adaptive'):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
+        self.multiplemode = multiplemode
 
         # Initializing the variable to use in the self adaptive mutation
         self.current_gen = 0
@@ -46,7 +47,7 @@ class CustomEASimple(evo_utils.BaseEAInstance):
         # Define some NB parameters for our EA
         self.CXPB = 0.7  # Probability of mating two individuals
         self.MUTPB = 0.3  # Probability of mutating an individual
-        self.NGEN = 10  # The number of generations
+        self.NGEN = 15  # The number of generations
         self.POPSIZE = 30  # Number of individuals per generation (population size)
         self.HOFSIZE = 5  # Maximum size of hall of fame (best genomes)
 
@@ -86,6 +87,7 @@ class CustomEASimple(evo_utils.BaseEAInstance):
                               experiment_name=self.experiment_directory,
                               player_controller=self.player_controller,
                               enemies=self.enemies,
+                              multiplemode=self.multiplemode,
                               )
 
         # Initialise our population

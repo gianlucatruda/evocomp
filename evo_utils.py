@@ -18,7 +18,9 @@ def evaluate(individual: list,
              player_controller: Controller,
              experiment_name='experiments/tmp',
              enemies=[2],
-             metric='fitness', speed='fastest') -> list:
+             metric='fitness',
+             speed='fastest',
+             multiplemode="no") -> list:
     """Custom evaluation function based on evoman specialist (NN)
 
     Parameters
@@ -46,7 +48,7 @@ def evaluate(individual: list,
     # initializes simulation in individual evolution mode, for single static enemy.
     env = Environment(
         experiment_name=experiment_name,
-        multiplemode="no",
+        multiplemode=multiplemode,
         enemies=enemies,
         playermode="ai",
         enemymode="static",
@@ -214,7 +216,7 @@ class BaseEAInstance(ABC):
     """Base class for EA instances.
     """
 
-    def __init__(self, experiment_directory='experiments/tmp', enemies=[2]):
+    def __init__(self, experiment_directory='experiments/tmp', enemies=[2], multiplemode="no"):
         self.experiment_directory = experiment_directory
         self.enemies = None
         self.player_controller = None

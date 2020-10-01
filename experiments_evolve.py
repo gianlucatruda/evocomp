@@ -21,10 +21,13 @@ from EA_base import BaselineEAInstance
 sys.path.insert(0, 'evoman')
 
 SAVEPATH = 'results'
-ENEMIES = [1, 3, 5]
+ENEMIES = [[1, 3], [2, 4]]
 REPEATS = 10
 VERBOSE = False
+INSTANCES = [BaselineEAInstance]
 
+# Automatically infers specialist or generalist from ENEMIES nesting
+multi = "yes" if any(isinstance(i, list) for i in ENEMIES) else "no"
 
 # Make sure savepath exists
 if not os.path.exists(SAVEPATH):
@@ -36,26 +39,29 @@ best_performers = {}
 results = []
 
 
-for ea_instance in [BaselineEAInstance, CustomEASimple]:
+for ea_instance in INSTANCES:
     print(f"\nInstance: {ea_instance}")
     # Instantiate nested dictionary for this instance
-    best_performers[str(ea_instance)] = {e: [] for e in ENEMIES}
-    for enemy in ENEMIES:
-        print(f"\nEnemy: {enemy}")
-        for repeat in tqdm(range(REPEATS), desc='Repeats'):
-
+    best_performers[str(ea_instance)] = {str(e): [] for e in ENEMIES}
+    for enemies in ENEMIES:
+        _enemies = [enemies]
+        if multi == "yes":
+            _enemies = enemies
+        print(f"\nEnemies: {_enemies}")
+        for _ in tqdm(range(REPEATS), desc='Repeats'):
             pop, stats, bests = ea_instance(
-                enemies=[enemy]).evolve(verbose=VERBOSE)
+                enemies=_enemies,
+                multiplemode=multi).evolve(verbose=VERBOSE)
 
             # Save the stats (fitness and genome)
-            stats['enemy'] = enemy
+            stats['enemies'] = str(enemies)
             stats['ea_instance'] = str(ea_instance)
 
             # Store the best genome
             best_fitness = np.max(list(bests.keys()))
             top_genome = bests[best_fitness]
 
-            best_performers[str(ea_instance)][enemy].append(top_genome)
+            best_performers[str(ea_instance)][str(enemies)].append(top_genome)
             results.append(stats)
 
 

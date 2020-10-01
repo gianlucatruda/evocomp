@@ -30,7 +30,7 @@ def format_online_results(df: pd.DataFrame):
     _df = df.copy()
 
     # Calculate statistics over all iterations
-    _df = _df.groupby(['ea_instance', 'enemy', 'gen']).agg(['mean', 'std'])
+    _df = _df.groupby(['ea_instance', 'enemies', 'gen']).agg(['mean', 'std'])
     # Tidy up the column names and collapse multi-index
     _df.columns = _df.columns.to_series().str.join('_')
     _df.reset_index(inplace=True)
@@ -49,7 +49,7 @@ def format_offline_results(df: pd.DataFrame):
     _df = df.copy()
 
     # Calculate statistics over all iterations
-    _df = _df.groupby(['ea_instance', 'enemy', 'individual'],
+    _df = _df.groupby(['ea_instance', 'enemies', 'individual'],
                       as_index=False).mean()
     _df.reset_index(inplace=True)
 
@@ -66,7 +66,7 @@ def specialist_lineplots(df: pd.DataFrame, save_path=None):
     Do one plot by enemy, thus, separately.
     """
 
-    enemies = df['enemy'].unique()
+    enemies = df['enemies'].unique()
     n_enemies = len(enemies)
     # Get neat versions of the instance names
     instances = df['ea_instance'].unique()
@@ -77,7 +77,8 @@ def specialist_lineplots(df: pd.DataFrame, save_path=None):
     for i, enemy in enumerate(enemies):
         for j, instance in enumerate(instances):
             colour = colours[j]
-            _df = df[(df['enemy'] == enemy) & (df['ea_instance'] == instance)]
+            _df = df[(df['enemies'] == enemy) & (
+                df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='mean_fitness_mean', yerr='mean_fitness_std',
                           ax=ax[i], c=colour, label=f'{instance} mean fitness', alpha=0.7, markersize=5, capsize=2)
             _df.plot.line(x='gen', y='max_fitness_mean', yerr='max_fitness_std',
@@ -103,14 +104,14 @@ def specialist_boxplots(df: pd.DataFrame, save_path=None):
     Note that you need to calculate the means of the 5 times for each solution of the algorithm for the enemy, and these means are the values that will be points in the box-plot. In summary, it is a total of 3 pairs of box-plots (so 6 boxes), being one pair per enemy.
     """
 
-    enemies = df['enemy'].unique()
+    enemies = df['enemies'].unique()
     n_enemies = len(enemies)
 
     fig, ax = plt.subplots(1, n_enemies)
     for i, enemy in enumerate(enemies):
-        _df = df[df['enemy'] == enemy]
+        _df = df[df['enemies'] == enemy]
         _df.boxplot(column='gain', by='ea_instance', grid=False, ax=ax[i])
-        ax[i].set_title(f'Enemy: {enemy}')
+        ax[i].set_title(f'Enemies: {enemy}')
         ax[i].set_ylabel('Gain score')
         ax[i].set_xlabel('')
         ax[i].tick_params(axis='x', labelrotation=90)
@@ -126,7 +127,7 @@ def diversity_compare(df: pd.DataFrame, save_path=None):
     across enemies.
     """
 
-    enemies = df['enemy'].unique()
+    enemies = df['enemies'].unique()
     n_enemies = len(enemies)
     # Get neat versions of the instance names
     instances = df['ea_instance'].unique()
@@ -137,10 +138,11 @@ def diversity_compare(df: pd.DataFrame, save_path=None):
     for i, enemy in enumerate(enemies):
         for j, instance in enumerate(instances):
             colour = colours[j]
-            _df = df[(df['enemy'] == enemy) & (df['ea_instance'] == instance)]
+            _df = df[(df['enemies'] == enemy) & (
+                df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='diversity_mean', yerr='diversity_std', fmt='.-',
                           ax=ax[i], c=colour, label=f'{instance} diversity', alpha=0.7, markersize=5, capsize=2)
-            ax[i].set_title(f'Enemy: {enemy}')
+            ax[i].set_title(f'Enemies: {enemy}')
             ax[i].set_xlabel('')
             handles, labels = ax[i].get_legend_handles_labels()
             ax[i].get_legend().remove()
@@ -192,19 +194,19 @@ def stat_test_t(df):
             "Need exactly 2 EA instances to do significance tests")
     ea1, ea2 = instances[0], instances[1]
 
-    stats_results = {'enemy': [], 'statistic': [], 'p_value': []}
+    stats_results = {'enemies': [], 'statistic': [], 'p_value': []}
 
-    for enemy in df['enemy'].unique():
+    for enemy in df['enemies'].unique():
         gains1 = df[(df['ea_instance'] == ea1) & (
-            df['enemy'] == enemy)]['gain'].values
+            df['enemies'] == enemy)]['gain'].values
         gains2 = df[(df['ea_instance'] == ea2) & (
-            df['enemy'] == enemy)]['gain'].values
+            df['enemies'] == enemy)]['gain'].values
 
         # Perform independent t-test for that enemy
         w, p = stats.ttest_ind(gains1, gains2)
 
         # Save results to dictionary of lists
-        stats_results['enemy'].append(enemy)
+        stats_results['enemies'].append(enemy)
         stats_results['statistic'].append(w)
         stats_results['p_value'].append(p)
 
@@ -215,15 +217,16 @@ def stat_test_t(df):
 
 if __name__ == "__main__":
     online_results = pd.read_csv(
-        'results/andre/09-24-03_54_12_online_results.csv')
+        'results/09-30-13_32_18_online_results.csv')
     offline_results = pd.read_csv(
-        'results/andre/09-24-07_43_32_offline_results.csv')
+        'results/09-30-14_07_49_offline_results.csv')
 
     # Format the data and calculate statistics
     online_summary = format_online_results(online_results)
-    print(online_summary.groupby(['ea_instance', 'enemy']).mean())
+    print('\nOnline results', online_summary.groupby(
+        ['ea_instance', 'enemies']).mean(), sep='\n', end='\n\n')
+
     offline_summary = format_offline_results(offline_results)
-    print(offline_summary.groupby(['ea_instance', 'enemy']).mean())
 
     # Specialist lineplots
     specialist_lineplots(
@@ -236,16 +239,28 @@ if __name__ == "__main__":
     # Significance tests
     df_sig = stat_test_t(offline_summary)
 
-    print(df_sig, end='\n\n\n')
-    print(df_sig.to_latex(index=False))
+    # Combine offline with significance
+    df_offline = offline_summary[['ea_instance', 'enemies', 'gain']].groupby(
+        ['ea_instance', 'enemies']).mean().reset_index()
+    df_offline = df_offline.pivot(
+        index='enemies', columns='ea_instance', values='gain')
+
+    df_offline = df_offline.merge(df_sig, on='enemies')
+    df_offline = df_offline.round(4)
+    print("\nOffline results", df_offline, sep='\n', end='\n\n')
+    print(df_offline.to_latex(index=False))
 
     # Diversity comparisons
     df_div = diversity_comparison(
-        'results/andre/09-24-03_54_12_best_genomes.json')
+        'results/09-30-13_32_18_best_genomes.json')
+
+    # Clean up names and ordering in dataframe
     df_div.columns = [tidy_instance_name(x) for x in df_div.columns]
-    print(df_div, end='\n\n\n')
-    print(df_div.to_latex())
+    # df_div = df_div[sorted([c for c in df_div.columns])]
+    df_div.reset_index(inplace=True)
+    print("\nDiversity results", df_div, sep='\n', end='\n\n\n')
+    print(df_div.to_latex(index=False))
 
     # Quick inspection of results
-    # df = pd.read_csv('experiments/tmp/09-22-18_58_02_logbook.csv')
-    # inspect_evolution_stats(df)
+    df = pd.read_csv('experiments/tmp/09-30-12_48_51_logbook.csv')
+    inspect_evolution_stats(df)
