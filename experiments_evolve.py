@@ -21,7 +21,7 @@ from EA_speciation import SpeciationEA
 sys.path.insert(0, 'evoman')
 
 SAVEPATH = 'results'
-ENEMIES = [[1, 3], [2, 4]]
+ENEMIES = [[1, 2, 7], [4, 6, 7]]
 REPEATS = 5
 VERBOSE = False
 INSTANCES = [SpeciationEA, BaselineEAInstance]
