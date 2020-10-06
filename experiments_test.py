@@ -22,12 +22,12 @@ if not OBSERVE:
     # Disable pygame load message
     os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
-from EA_adaptive import CustomEASimple
 from EA_base import BaselineEAInstance
+from EA_speciation import SpeciationEA
 import evo_utils
 from simple_controller import player_controller
 
-INSTANCES = [BaselineEAInstance]
+INSTANCES = [SpeciationEA, BaselineEAInstance]
 
 
 if __name__ == '__main__':

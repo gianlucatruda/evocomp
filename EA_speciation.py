@@ -50,8 +50,8 @@ class SpeciationEA(BaseEAInstance):
                  enemies=[2],
                  CXPB=0.5,
                  MUTPB=0.3,
-                 NGEN=15,
-                 POPSIZE=30,
+                 NGEN=10,
+                 POPSIZE=20,
                  HOFSIZE=5,
                  SPECIES_THRESH=0.6,
                  multiplemode="no"):
