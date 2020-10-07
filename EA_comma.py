@@ -25,7 +25,7 @@ class CommaEAInstance(BaseEAInstance):
                  CXPB=0.5,
                  MUTPB=0.3,
                  NGEN=20,
-                 POPSIZE=30,
+                 POPSIZE=20,
                  HOFSIZE=5,
                  LAMBDA=None,
                  multiplemode="no"):
@@ -45,7 +45,7 @@ class CommaEAInstance(BaseEAInstance):
         self.LAMBDA = LAMBDA # Number of children to make each generation
 
         if self.LAMBDA is None:
-            self.LAMBDA = int(6 * self.MU)
+            self.LAMBDA = int(2 * self.MU)
 
         # Set directory for saving logs and experiment states
         if not os.path.exists(self.experiment_directory):
