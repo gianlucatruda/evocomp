@@ -15,6 +15,10 @@ from evo_utils import genome_to_txt
 
 
 def best_indiv_to_txt(path):
+    """
+        Reads the best individuals from the json file and
+        converts them to the txt format
+    """
     # Read in the dictionary of best performers
     read_path = path
     with open(read_path, 'r') as file:
@@ -42,16 +46,21 @@ def simulation(env, pcont):
 
 
 def rankI_evaluation(results):
-    print("\n@@@@@@@@@@@@@@@@@@@@@\n")
+    print("\n@@@@@@@@@ RANK I @@@@@@@@@@@@\n")
     print("The number of defeated enenies is {}/8.".format(results.get("defeated")))
     print("In case of Ties:")
-    print("The accumulated evoman's life is {}/800.".format(results.get("pl_life")))
-    print("The accumulated enenimies life is {}/800.".format(results.get("en_life")))
+    print("The accumulated evoman's life is {:.3f}/800.".format(results.get("pl_life")))
+    print("The total matches time is {}/10000.".format(results.get("time")))
+    print("Additional info:")
+    print("The accumulated enemies life is {:.3f}/800.".format(results.get("en_life")))
     pass
 
 
-def rankII_evaluation():
-    pass
+def rankII_evaluation(gains):
+    print("\n@@@@@@@@@ RANK II @@@@@@@@@@@@\n")
+    print("The overall gain across the 8 enemies is:\n")
+    for g in gains:
+        print("{}\n".format(g))
 
 
 def main(path):
@@ -89,6 +98,7 @@ def main(path):
 
     enemies = [i for i in range(1, 9)]
     results = {"defeated": 0, "pl_life": 0, "en_life": 0, "time": 0}
+    gains = [0 for i in range(len(enemies))]
     for en in enemies:
         env.update_parameter('enemies', [en])
         res = np.array(list(map(lambda y: simulation(env, y), [bsol])))
@@ -99,7 +109,10 @@ def main(path):
         results["en_life"] = results.get("en_life") + res[2]
         results["time"] = results.get("time") + res[3]
 
+        gains[en-1] = res[1] - res[2]
+
     rankI_evaluation(results)
+    rankII_evaluation(gains)
 
 
 if __name__ == "__main__":
