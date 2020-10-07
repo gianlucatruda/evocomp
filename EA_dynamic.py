@@ -240,8 +240,8 @@ if __name__ == "__main__":
     os.environ["SDL_VIDEODRIVER"] = 'dummy'
     ea_instance = DynamicEAInstance(
         NGEN=50,
-        enemies=[1, 2, 3, 4, 5, 6, 7],
+        enemies=[1, 2, 3, 4, 5, 6, 7, 8],
         multiplemode="yes",
-        seeding_path="experiments/tmp/10-07-16_52_16_best_individuals.json",
+        # seeding_path="experiments/tmp/10-07-16_52_16_best_individuals.json",
         )
     final_population, stats, best = ea_instance.evolve(verbose=True)
