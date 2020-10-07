@@ -91,7 +91,7 @@ class DynamicEAInstance(BaseEAInstance):
     def evolve(self, verbose=True):
 
         if verbose:
-            print(f"\nRunning EA for {self.NGEN} generations on enemies {self.ENEMIES}...\n")
+            print(f"\nRunning EA for {self.NGEN} generations on enemies {self.enemies}...\n")
 
         self.final_population, self.logbook = self.custom_ea(
             verbose=verbose)
