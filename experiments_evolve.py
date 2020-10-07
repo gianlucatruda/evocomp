@@ -18,14 +18,15 @@ import evo_utils
 from EA_base import BaselineEAInstance
 from EA_speciation import SpeciationEA
 from EA_plus import PlusEAInstance
+from EA_comma import CommaEAInstance
 
 sys.path.insert(0, 'evoman')
 
 SAVEPATH = 'results'
 ENEMIES = [[1, 2, 7], [4, 6, 7]]
-REPEATS = 5
+REPEATS = 10
 VERBOSE = False
-INSTANCES = [SpeciationEA, BaselineEAInstance]
+INSTANCES = [CommaEAInstance, PlusEAInstance]
 
 # Automatically infers specialist or generalist from ENEMIES nesting
 multi = "yes" if any(isinstance(i, list) for i in ENEMIES) else "no"
@@ -70,6 +71,9 @@ now = datetime.now().strftime("%m-%d-%H_%M_%S")  # Timestamp
 
 # Combine the overall statistics
 df_results = pd.concat(results)
+
+print(f"\n\nEvolutions complete for {INSTANCES}\n")
+
 # Save ALL the results to CSV
 f_name = f"{SAVEPATH}/{now}_online_results.csv"
 df_results.to_csv(f_name)

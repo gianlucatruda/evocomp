@@ -25,10 +25,11 @@ if not OBSERVE:
 from EA_base import BaselineEAInstance
 from EA_speciation import SpeciationEA
 from EA_plus import PlusEAInstance
+from EA_comma import CommaEAInstance
 import evo_utils
 from simple_controller import player_controller
 
-INSTANCES = [SpeciationEA, BaselineEAInstance]
+INSTANCES = [CommaEAInstance, PlusEAInstance]
 
 
 if __name__ == '__main__':
@@ -102,6 +103,6 @@ if not OBSERVE:
     print(f"\nResults saved to {f_name}")
 
 
-print("\n\nResult summary:\n")
+print(f"\n\nResult summary: for {INSTANCES}\n")
 print(df_results.drop('individual', axis=1).groupby(
     ['ea_instance', 'enemies']).mean())
