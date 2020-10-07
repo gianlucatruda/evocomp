@@ -7,6 +7,7 @@ import random
 from datetime import datetime
 
 from deap import algorithms, base, creator, tools
+import numpy as np
 
 import evo_utils
 from evo_utils import BaseEAInstance
@@ -90,7 +91,7 @@ class DynamicEAInstance(BaseEAInstance):
     def evolve(self, verbose=True):
 
         if verbose:
-            print(f"\nRunning EA for {self.NGEN} generations...\n")
+            print(f"\nRunning EA for {self.NGEN} generations on enemies {self.ENEMIES}...\n")
 
         self.final_population, self.logbook = self.custom_ea(
             verbose=verbose)
@@ -170,11 +171,8 @@ class DynamicEAInstance(BaseEAInstance):
             # Probability of mutating an individual
             mutpb = max(temperature * self.MUTPB, 0.1)
 
-            # Active population size
-            popsize = self.POPSIZE if gen > 3 else 60
-
             if gen % 5 == 1 and verbose:
-                print(f"CXPB: {cxpb}\tMUTPB: {mutpb}\tPOP: {popsize}")
+                print(f"CXPB: {cxpb}\tMUTPB: {mutpb}")
 
 
             # Select the next generation individuals
@@ -207,12 +205,11 @@ class DynamicEAInstance(BaseEAInstance):
                 self.hall_of_fame.update(offspring)
 
             # Custom code to purge bad individuals when temp is low
-            if temperature < 0.5:
-                median_fitness = np.median([i.fitness.values[0] for i in offpring])
-                old_size = len(offpring)
-                print(f"Purging bad individuals (fitness < {median_fitness}")
-                offspring = [i for i in offpring if i.fitness.values[0] > median_fitness]
-                print(f"Remaining: {len(offspring)}/{old_size}")
+            if temperature < 0.4:
+                # Purging bottom 5 individuals and seeding from hall-of-fame
+                offspring = sorted(offspring, key=lambda x: x.fitness.values[0])[5:]
+                offspring.extend([self.toolbox.clone(
+                    ind) for ind in random.choices(self.hall_of_fame.items, k=5)])
 
             # Replace the current population by the offspring
             self.population[:] = offspring
@@ -229,5 +226,8 @@ class DynamicEAInstance(BaseEAInstance):
 if __name__ == "__main__":
     os.putenv("SDL_VIDEODRIVER", "fbcon")
     os.environ["SDL_VIDEODRIVER"] = 'dummy'
-    ea_instance = DynamicEAInstance(enemies=[1, 2, 7], multiplemode="yes")
+    ea_instance = DynamicEAInstance(
+        NGEN=50,
+        enemies=[1, 3, 4, 6, 7],
+        multiplemode="yes",)
     final_population, stats, best = ea_instance.evolve(verbose=True)
