@@ -18,7 +18,7 @@ N_HIDDEN_NEURONS = 10  # how many neurons in the hidden layer of the NN
 IND_SIZE = 21 * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS + 1) * 5
 
 
-class PlusEAInstance(BaseEAInstance):
+class CommaEAInstance(BaseEAInstance):
     def __init__(self,
                  experiment_directory='experiments/tmp',
                  enemies=[2],
@@ -98,7 +98,7 @@ class PlusEAInstance(BaseEAInstance):
         if verbose:
             print(f"\nRunning EA for {self.NGEN} generations...\n")
 
-        self.final_population, self.logbook = algorithms.eaMuPlusLambda(
+        self.final_population, self.logbook = algorithms.eaMuCommaLambda(
             self.population, self.toolbox,
             self.MU, self.LAMBDA,
             self.CXPB, self.MUTPB, self.NGEN,
