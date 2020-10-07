@@ -5,6 +5,7 @@ import time
 
 import json
 from datetime import datetime
+import pandas as pd
 
 sys.path.insert(0, 'evoman')
 
@@ -47,12 +48,12 @@ def simulation(env, pcont):
 
 def rankI_evaluation(results):
     print("\n@@@@@@@@@ RANK I @@@@@@@@@@@@\n")
-    print("The number of defeated enenies is {}/8.".format(results.get("defeated")))
+    print("The number of defeated enenies is {}/8.".format(sum(results.get("defeated"))))
     print("In case of Ties:")
-    print("The accumulated evoman's life is {:.3f}/800.".format(results.get("pl_life")))
-    print("The total matches time is {}/10000.".format(results.get("time")))
+    print("The accumulated evoman's life is {:.3f}/800.".format(sum(results.get("pl_life"))))
+    print("The total matches time is {}/10000.".format(sum(results.get("time"))))
     print("Additional info:")
-    print("The accumulated enemies life is {:.3f}/800.".format(results.get("en_life")))
+    print("The accumulated enemies life is {:.3f}/800.".format(sum(results.get("en_life"))))
     pass
 
 
@@ -60,7 +61,7 @@ def rankII_evaluation(gains):
     print("\n@@@@@@@@@ RANK II @@@@@@@@@@@@\n")
     print("The overall gain across the 8 enemies is:\n")
     for g in gains:
-        print("{}\n".format(g))
+        print("{}".format(g))
 
 
 def main(path):
@@ -97,27 +98,37 @@ def main(path):
     env.update_parameter('speed', 'fastest')
 
     enemies = [i for i in range(1, 9)]
-    results = {"defeated": 0, "pl_life": 0, "en_life": 0, "time": 0}
-    gains = [0 for i in range(len(enemies))]
+    results = {"defeated": [], "pl_life": [], "en_life": [], "time": [], "gain": []}
     for en in enemies:
         env.update_parameter('enemies', [en])
         res = np.array(list(map(lambda y: simulation(env, y), [bsol])))
         res = res[0]
         if res[2] == 0:
-            results["defeated"] = results.get("defeated") + 1
-        results["pl_life"] = results.get("pl_life") + res[1]
-        results["en_life"] = results.get("en_life") + res[2]
-        results["time"] = results.get("time") + res[3]
+            results["defeated"].append(1)
+        else:
+            results["defeated"].append(0)
+        results["pl_life"].append(res[1])
+        results["en_life"].append(res[2])
+        results["time"].append(res[3])
 
-        gains[en-1] = res[1] - res[2]
+        results["gain"].append(res[1] - res[2])
 
     rankI_evaluation(results)
-    rankII_evaluation(gains)
+    rankII_evaluation(results["gain"])
+
+    # Turn results into a dataframe
+    df_results = pd.DataFrame(results)
+
+    # Save the dataframe
+    now = datetime.now().strftime("%m-%d-%H_%M_%S")  # Timestamp
+    f_name = f"results/{now}_competition_results.csv"
+    df_results.to_csv(f_name)
+    print(f"\nResults saved to {f_name}")
 
 
 if __name__ == "__main__":
     # Converting best individuals from json to txt
-    # best_indiv_to_txt("results/10-02-16_34_37_best_individuals_no_minmax.json")
+    # best_indiv_to_txt("results/10-07-16_52_16_best_individuals.json")
 
     if len(sys.argv) < 2:
         print("Requires the path to the best genome .txt file ...")
