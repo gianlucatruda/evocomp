@@ -19,7 +19,15 @@ IND_SIZE = 21 * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS + 1) * 5
 
 
 class BaselineEAInstance(BaseEAInstance):
-    def __init__(self, experiment_directory='experiments/tmp', enemies=[2], CXPB=0.5, MUTPB=0.3, NGEN=15, POPSIZE=30, HOFSIZE=5, multiplemode="no"):
+    def __init__(self,
+                 experiment_directory='experiments/tmp',
+                 enemies=[2],
+                 CXPB=0.5,
+                 MUTPB=0.3,
+                 NGEN=20,
+                 POPSIZE=30,
+                 HOFSIZE=5,
+                 multiplemode="no"):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
         self.multiplemode = multiplemode
