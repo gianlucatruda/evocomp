@@ -19,6 +19,7 @@ from EA_base import BaselineEAInstance
 from EA_speciation import SpeciationEA
 from EA_plus import PlusEAInstance
 from EA_comma import CommaEAInstance
+from EA_dynamic import DynamicEAInstance
 
 sys.path.insert(0, 'evoman')
 
@@ -26,7 +27,8 @@ SAVEPATH = 'results'
 ENEMIES = [[1, 2, 7], [4, 6, 7]]
 REPEATS = 10
 VERBOSE = False
-INSTANCES = [CommaEAInstance, PlusEAInstance]
+# INSTANCES = [CommaEAInstance, PlusEAInstance]
+INSTANCES = [DynamicEAInstance, BaselineEAInstance]
 
 # Automatically infers specialist or generalist from ENEMIES nesting
 multi = "yes" if any(isinstance(i, list) for i in ENEMIES) else "no"

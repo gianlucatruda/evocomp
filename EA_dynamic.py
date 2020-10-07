@@ -25,7 +25,7 @@ class DynamicEAInstance(BaseEAInstance):
                  enemies=[2],
                  CXPB=1.0,
                  MUTPB=0.8,
-                 NGEN=30,
+                 NGEN=15,
                  POPSIZE=30,
                  HOFSIZE=5,
                  multiplemode="no"):

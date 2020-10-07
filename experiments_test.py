@@ -26,11 +26,12 @@ from EA_base import BaselineEAInstance
 from EA_speciation import SpeciationEA
 from EA_plus import PlusEAInstance
 from EA_comma import CommaEAInstance
+from EA_dynamic import DynamicEAInstance
 import evo_utils
 from simple_controller import player_controller
 
-INSTANCES = [CommaEAInstance, PlusEAInstance]
-
+# INSTANCES = [CommaEAInstance, PlusEAInstance]
+INSTANCES = [DynamicEAInstance, BaselineEAInstance]
 
 if __name__ == '__main__':
     # Read the results from the specified path
