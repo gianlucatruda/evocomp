@@ -3,10 +3,30 @@ import os
 import numpy as np
 import time
 
+import json
+from datetime import datetime
+
 sys.path.insert(0, 'evoman')
 
 from simple_controller import player_controller
 from evoman.environment import Environment
+
+from evo_utils import genome_to_txt
+
+
+def best_indiv_to_txt(path):
+    # Read in the dictionary of best performers
+    read_path = path
+    with open(read_path, 'r') as file:
+        best_performers = json.load(file)
+
+    for best in best_performers.keys():
+        print(best)
+        individual = best_performers[best]
+        # print(individual)
+        now = datetime.now().strftime("%m-%d-%H_%M_%S")  # Timestamp
+        genome_to_txt(individual, f"results/best_{now}.txt")
+        time.sleep(1)
 
 
 def simulation(env, pcont):
@@ -22,7 +42,11 @@ def simulation(env, pcont):
 
 
 def rankI_evaluation(results):
-    print(results)
+    print("\n@@@@@@@@@@@@@@@@@@@@@\n")
+    print("The number of defeated enenies is {}/8.".format(results.get("defeated")))
+    print("In case of Ties:")
+    print("The accumulated evoman's life is {}/800.".format(results.get("pl_life")))
+    print("The accumulated enenimies life is {}/800.".format(results.get("en_life")))
     pass
 
 
@@ -46,8 +70,6 @@ def main(path):
     N_HIDDEN_NEURONS = 10  # how many neurons in the hidden layer of the NN
     # Initialise the controller (neural network) for our AI player
     nn_controller = player_controller(N_HIDDEN_NEURONS)
-
-    RUN_MODE = 'train'  # train or test mode
 
     # initializes simulation in individual evolution mode, for single static enemy.
     env = Environment(experiment_name=EXPERIMENT_DIRECTORY,
@@ -81,7 +103,11 @@ def main(path):
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
+    # Converting best individuals from json to txt
+    # best_indiv_to_txt("results/10-02-16_34_37_best_individuals_no_minmax.json")
+
+    if len(sys.argv) < 2:
         print("Requires the path to the best genome .txt file ...")
         exit(0)
+
     main(sys.argv[1])
