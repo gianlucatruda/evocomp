@@ -3,6 +3,7 @@ sys.path.insert(0, 'evoman')
 import os
 from abc import ABC
 import json
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -12,6 +13,41 @@ from scipy.spatial import distance
 from evoman.controller import Controller
 from evoman.environment import Environment
 from simple_controller import player_controller
+
+
+def genome_to_txt(genome, filepath, strict=True):
+    """Saves `genome` to `filepath` in competition format.
+    """
+
+    # Make sure genome is numpy array
+    _genome = np.array(genome)
+
+    if strict and _genome.shape != (265, ):
+        raise ValueError(
+            f"Genome must be of shape (265,), but is of shape {_genome.shape}")
+
+    # Ensure path exists
+    path = Path(filepath)
+    if not os.path.exists(str(path.parent)):
+        os.makedirs(str(path.parent))
+
+    # Save to txt file
+    np.savetxt(str(path), _genome)
+
+
+def init_population(pop_dtype, ind_dtype, filenames):
+    if type(filenames) != list:
+        filenames = [filenames]
+    inds = []
+    for filename in filenames:
+        if filename.split('.')[-1] == 'json':
+            print('Processing json file')
+            with open(filename, "r") as f:
+                inds += json.load(f).values()
+        elif filename.split('.')[-1] == 'txt':
+            print('Processing txt file')
+            inds += [np.loadtxt(filename)]
+    return pop_dtype(ind_dtype(ind) for ind in inds)
 
 
 def evaluate(individual: list,

@@ -24,10 +24,12 @@ class BaselineEAInstance(BaseEAInstance):
                  enemies=[2],
                  CXPB=0.5,
                  MUTPB=0.3,
-                 NGEN=20,
+                 NGEN=15,
                  POPSIZE=30,
                  HOFSIZE=5,
-                 multiplemode="no"):
+                 multiplemode="no",
+                 seeding_path=None,
+                 ):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
         self.multiplemode = multiplemode
@@ -53,6 +55,10 @@ class BaselineEAInstance(BaseEAInstance):
 
         # Create a new "toolbox"
         self.toolbox = base.Toolbox()
+        if seeding_path:
+            self.toolbox.register("seeded_population", evo_utils.init_population, list, creator.Individual,
+                                  seeding_path)
+
         # Attributes for our individuals are initialised as random floats
         self.toolbox.register("attribute", random.uniform, -1, 1)
         self.toolbox.register("individual", tools.initRepeat, creator.Individual,
@@ -60,6 +66,9 @@ class BaselineEAInstance(BaseEAInstance):
         # Define a population of these individuals
         self.toolbox.register(
             "population", tools.initRepeat, list, self.toolbox.individual)
+
+
+        #base.population += base.toolbox.population_guess()
 
         # We set our operators
         self.toolbox.register("mate", tools.cxUniform, indpb=0.5)
@@ -76,7 +85,12 @@ class BaselineEAInstance(BaseEAInstance):
                               )
 
         # Initialise our population
-        self.population = self.toolbox.population(n=POPSIZE)
+        seeded_population = []
+        if seeding_path:
+            seeded_population = self.toolbox.seeded_population()
+        if POPSIZE - len(seeded_population) < 0:
+            print(f'Seeded population exceeds the given population size, corrected to {len(seeded_population)}')
+        self.population = self.toolbox.population(n=max(0, POPSIZE - len(seeded_population))) + seeded_population
 
         # Create Hall of Fame (keeps N best individuals over all history)
         self.hall_of_fame = tools.HallOfFame(maxsize=HOFSIZE)
