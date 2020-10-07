@@ -28,7 +28,9 @@ class DynamicEAInstance(BaseEAInstance):
                  NGEN=15,
                  POPSIZE=30,
                  HOFSIZE=5,
-                 multiplemode="no"):
+                 multiplemode="no",
+                 seeding_path=None,
+                 ):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
         self.multiplemode = multiplemode
@@ -55,6 +57,10 @@ class DynamicEAInstance(BaseEAInstance):
 
         # Create a new "toolbox"
         self.toolbox = base.Toolbox()
+        if seeding_path:
+            self.toolbox.register("seeded_population",
+                evo_utils.init_population, list, creator.Individual,seeding_path)
+
         # Attributes for our individuals are initialised as random floats
         self.toolbox.register("attribute", random.uniform, -1, 1)
         self.toolbox.register("individual", tools.initRepeat, creator.Individual,
@@ -80,7 +86,13 @@ class DynamicEAInstance(BaseEAInstance):
                               )
 
         # Initialise our population
-        self.population = self.toolbox.population(n=POPSIZE)
+        seeded_population = []
+        if seeding_path:
+            seeded_population = self.toolbox.seeded_population()
+        if POPSIZE - len(seeded_population) < 0:
+            print(f'Seeded population exceeds the given population size, corrected to {len(seeded_population)}')
+        self.population = self.toolbox.population(
+            n=max(0, POPSIZE - len(seeded_population))) + seeded_population
 
         # Create Hall of Fame (keeps N best individuals over all history)
         self.hall_of_fame = tools.HallOfFame(maxsize=HOFSIZE)
@@ -228,6 +240,8 @@ if __name__ == "__main__":
     os.environ["SDL_VIDEODRIVER"] = 'dummy'
     ea_instance = DynamicEAInstance(
         NGEN=50,
-        enemies=[1, 3, 4, 6, 7],
-        multiplemode="yes",)
+        enemies=[1, 2, 3, 4, 5, 6, 7],
+        multiplemode="yes",
+        seeding_path="experiments/tmp/10-07-16_52_16_best_individuals.json",
+        )
     final_population, stats, best = ea_instance.evolve(verbose=True)
