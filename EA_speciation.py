@@ -50,10 +50,10 @@ class SpeciationEA(BaseEAInstance):
                  enemies=[2],
                  CXPB=0.5,
                  MUTPB=0.3,
-                 NGEN=10,
-                 POPSIZE=20,
+                 NGEN=20,
+                 POPSIZE=30,
                  HOFSIZE=5,
-                 SPECIES_THRESH=0.6,
+                 SPECIES_THRESH=1.0,
                  multiplemode="no"):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
