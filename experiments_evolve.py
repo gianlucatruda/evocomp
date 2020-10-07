@@ -17,6 +17,7 @@ os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 import evo_utils
 from EA_base import BaselineEAInstance
 from EA_speciation import SpeciationEA
+from EA_plus import PlusEAInstance
 
 sys.path.insert(0, 'evoman')
 

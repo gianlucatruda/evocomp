@@ -24,6 +24,7 @@ if not OBSERVE:
 
 from EA_base import BaselineEAInstance
 from EA_speciation import SpeciationEA
+from EA_plus import PlusEAInstance
 import evo_utils
 from simple_controller import player_controller
 
