@@ -218,6 +218,10 @@ def stat_test_t(df):
 
 if __name__ == "__main__":
 
+    # Quick inspection of results
+    # df = pd.read_csv('experiments/tmp/10-07-13_47_16_logbook.csv')
+    # inspect_evolution_stats(df)
+
     if len(sys.argv) < 3:
         sys.exit("Need python3 visualiser.py <online_results> <offline_results> [optional genomes]")
 
@@ -262,7 +266,3 @@ if __name__ == "__main__":
         df_div.reset_index(inplace=True)
         print("\nDiversity results", df_div, sep='\n', end='\n\n\n')
         print(df_div.to_latex(index=False))
-
-    # Quick inspection of results
-    # df = pd.read_csv('experiments/tmp/09-30-12_48_51_logbook.csv')
-    # inspect_evolution_stats(df)
