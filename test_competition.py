@@ -2,6 +2,7 @@ import sys
 import os
 import numpy as np
 import time
+from pathlib import Path
 
 import json
 from datetime import datetime
@@ -98,11 +99,12 @@ def main(path):
     env.update_parameter('speed', 'fastest')
 
     enemies = [i for i in range(1, 9)]
-    results = {"defeated": [], "pl_life": [], "en_life": [], "time": [], "gain": []}
+    results = {"enemy": [], "defeated": [], "pl_life": [], "en_life": [], "time": [], "gain": []}
     for en in enemies:
         env.update_parameter('enemies', [en])
         res = np.array(list(map(lambda y: simulation(env, y), [bsol])))
         res = res[0]
+        results['enemy'].append(en)
         if res[2] == 0:
             results["defeated"].append(1)
         else:
@@ -122,16 +124,23 @@ def main(path):
     # Save the dataframe
     now = datetime.now().strftime("%m-%d-%H_%M_%S")  # Timestamp
     f_name = f"results/{now}_competition_results.csv"
-    df_results.to_csv(f_name)
+    df_results.to_csv(f_name, index=False)
     print(f"\nResults saved to {f_name}")
 
 
 if __name__ == "__main__":
     # Converting best individuals from json to txt
-    # best_indiv_to_txt("results/10-07-16_52_16_best_individuals.json")
+    # best_indiv_to_txt("experiments/tmp/10-07-23_53_48_best_individuals.json")
 
     if len(sys.argv) < 2:
         print("Requires the path to the best genome .txt file ...")
         exit(0)
 
-    main(sys.argv[1])
+    # Run single file if passed, else run all files in directory given
+    path = sys.argv[1]
+    if path.endswith(".txt"):
+        main(path)
+    else:
+        for file in Path(path).glob("*.txt"):
+            print(f"Testing: {file}")
+            main(file)
