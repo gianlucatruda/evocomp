@@ -267,7 +267,7 @@ if __name__ == "__main__":
     # df_offline = df_offline.merge(df_sig, on='enemies')
     df_offline = df_offline.round(4)
     print("\nOffline results", df_offline, sep='\n', end='\n\n')
-    print(df_offline.to_latex(index=False))
+    print(df_offline.to_latex(index=True))
 
     # Diversity comparisons
     if len(sys.argv) == 4:
