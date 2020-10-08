@@ -9,6 +9,7 @@ from scipy import stats
 from evo_utils import diversity_comparison
 
 SAVE_DPI = 300
+COLOURS = ['gray', 'blue', 'red']
 
 if not os.path.exists('figs'):
     os.makedirs('figs')
@@ -73,27 +74,32 @@ def specialist_lineplots(df: pd.DataFrame, save_path=None):
     instances = df['ea_instance'].unique()
 
     fig, ax = plt.subplots(n_enemies, 1)
-    colours = ['blue', 'red']
 
     for i, enemy in enumerate(enemies):
         for j, instance in enumerate(instances):
-            colour = colours[j]
+            colour = COLOURS[j]
             _df = df[(df['enemies'] == enemy) & (
                 df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='mean_fitness_mean', yerr='mean_fitness_std',
                           ax=ax[i], c=colour, label=f'{instance} mean fitness', alpha=0.7, markersize=5, capsize=2)
             _df.plot.line(x='gen', y='max_fitness_mean', yerr='max_fitness_std',
                           ax=ax[i], c=colour, linestyle='--', label=f'{instance} max fitness', alpha=0.7, markersize=5, capsize=2)
-            ax[i].set_title(f'Enemy: {enemy}')
+            ax[i].set_title(f'Training enemies: {enemy}')
             ax[i].set_xlabel('')
             handles, labels = ax[i].get_legend_handles_labels()
             ax[i].get_legend().remove()
 
-    fig.legend(handles, labels, loc='lower right', framealpha=1.0)
+    fig.legend(handles, labels,
+        framealpha=1.0,
+        loc='lower center',
+        fancybox=False,
+        shadow=False,
+        ncol=3)
 
     plt.xlabel('Generation')
     plt.ylabel('Fitness score')
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.2)
     if save_path is not None:
         plt.savefig(save_path, dpi=SAVE_DPI)
     plt.show()
@@ -112,7 +118,7 @@ def specialist_boxplots(df: pd.DataFrame, save_path=None):
     for i, enemy in enumerate(enemies):
         _df = df[df['enemies'] == enemy]
         _df.boxplot(column='gain', by='ea_instance', grid=False, ax=ax[i])
-        ax[i].set_title(f'Enemies: {enemy}')
+        ax[i].set_title(f'Training enemies: {enemy}')
         ax[i].set_ylabel('Gain score')
         ax[i].set_xlabel('')
         ax[i].tick_params(axis='x', labelrotation=90)
@@ -134,25 +140,30 @@ def diversity_compare(df: pd.DataFrame, save_path=None):
     instances = df['ea_instance'].unique()
 
     fig, ax = plt.subplots(n_enemies, 1)
-    colours = ['blue', 'red']
 
     for i, enemy in enumerate(enemies):
         for j, instance in enumerate(instances):
-            colour = colours[j]
+            colour = COLOURS[j]
             _df = df[(df['enemies'] == enemy) & (
                 df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='diversity_mean', yerr='diversity_std', fmt='.-',
                           ax=ax[i], c=colour, label=f'{instance} diversity', alpha=0.7, markersize=5, capsize=2)
-            ax[i].set_title(f'Enemies: {enemy}')
+            ax[i].set_title(f'Training enemies: {enemy}')
             ax[i].set_xlabel('')
             handles, labels = ax[i].get_legend_handles_labels()
             ax[i].get_legend().remove()
 
-    fig.legend(handles, labels, loc='lower right', framealpha=1.0)
+    fig.legend(handles, labels,
+                framealpha=1.0,
+                loc='lower center',
+                fancybox=False,
+                shadow=False,
+                ncol=3)
 
     plt.xlabel('Generation')
     plt.ylabel('Relative population diversity')
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.2)
     if save_path is not None:
         plt.savefig(save_path, dpi=SAVE_DPI)
     plt.show()
