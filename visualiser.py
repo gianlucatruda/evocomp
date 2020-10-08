@@ -201,26 +201,27 @@ def stat_test_t(df):
 
     # Load names of EA instances
     instances = df['ea_instance'].unique()
-    if len(instances) != 2:
-        raise ValueError(
-            "Need exactly 2 EA instances to do significance tests")
-    ea1, ea2 = instances[0], instances[1]
 
-    stats_results = {'enemies': [], 'statistic': [], 'p_value': []}
+    baseline = instances[0]
 
-    for enemy in df['enemies'].unique():
-        gains1 = df[(df['ea_instance'] == ea1) & (
-            df['enemies'] == enemy)]['gain'].values
-        gains2 = df[(df['ea_instance'] == ea2) & (
-            df['enemies'] == enemy)]['gain'].values
+    for ea in instances[1:]:
 
-        # Perform independent t-test for that enemy
-        w, p = stats.ttest_ind(gains1, gains2)
+        stats_results = {'enemies': [], 'statistic': [], 'p_value': []}
 
-        # Save results to dictionary of lists
-        stats_results['enemies'].append(enemy)
-        stats_results['statistic'].append(w)
-        stats_results['p_value'].append(p)
+        for enemy in df['enemies'].unique():
+            gains1 = df[(df['ea_instance'] == baseline) & (
+                df['enemies'] == enemy)]['gain'].values
+            gains2 = df[(df['ea_instance'] == ea) & (
+                df['enemies'] == enemy)]['gain'].values
+
+            # Perform independent t-test for that enemy
+            w, p = stats.ttest_ind(gains1, gains2)
+
+            # Save results to dictionary of lists
+            stats_results['enemies'].append(enemy)
+            stats_results['statistic'].append(w)
+            stats_results['p_value'].append(p)
+            print(f"p-val: {instances[0]} vs {ea}: {p}")
 
     # Make dataframe of significance results
     df = pd.DataFrame(stats_results)
@@ -263,7 +264,7 @@ if __name__ == "__main__":
     df_offline = df_offline.pivot(
         index='enemies', columns='ea_instance', values='gain')
 
-    df_offline = df_offline.merge(df_sig, on='enemies')
+    # df_offline = df_offline.merge(df_sig, on='enemies')
     df_offline = df_offline.round(4)
     print("\nOffline results", df_offline, sep='\n', end='\n\n')
     print(df_offline.to_latex(index=False))
