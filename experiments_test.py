@@ -22,13 +22,16 @@ if not OBSERVE:
     # Disable pygame load message
     os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
-from EA_adaptive import CustomEASimple
 from EA_base import BaselineEAInstance
+from EA_speciation import SpeciationEA
+from EA_plus import PlusEAInstance
+from EA_comma import CommaEAInstance
+from EA_dynamic import DynamicEAInstance
 import evo_utils
 from simple_controller import player_controller
 
-INSTANCES = [BaselineEAInstance]
-
+# INSTANCES = [CommaEAInstance, PlusEAInstance]
+INSTANCES = [DynamicEAInstance, BaselineEAInstance]
 
 if __name__ == '__main__':
     # Read the results from the specified path
@@ -101,6 +104,6 @@ if not OBSERVE:
     print(f"\nResults saved to {f_name}")
 
 
-print("\n\nResult summary:\n")
+print(f"\n\nResult summary: for {INSTANCES}\n")
 print(df_results.drop('individual', axis=1).groupby(
     ['ea_instance', 'enemies']).mean())

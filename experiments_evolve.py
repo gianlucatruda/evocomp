@@ -15,16 +15,20 @@ os.environ["SDL_VIDEODRIVER"] = 'dummy'
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = "hide"
 
 import evo_utils
-from EA_adaptive import CustomEASimple
 from EA_base import BaselineEAInstance
+from EA_speciation import SpeciationEA
+from EA_plus import PlusEAInstance
+from EA_comma import CommaEAInstance
+from EA_dynamic import DynamicEAInstance
 
 sys.path.insert(0, 'evoman')
 
 SAVEPATH = 'results'
-ENEMIES = [[1, 3], [2, 4]]
+ENEMIES = [[1, 2, 7], [4, 6, 7]]
 REPEATS = 10
 VERBOSE = False
-INSTANCES = [BaselineEAInstance]
+# INSTANCES = [CommaEAInstance, PlusEAInstance]
+INSTANCES = [DynamicEAInstance, BaselineEAInstance]
 
 # Automatically infers specialist or generalist from ENEMIES nesting
 multi = "yes" if any(isinstance(i, list) for i in ENEMIES) else "no"
@@ -69,6 +73,9 @@ now = datetime.now().strftime("%m-%d-%H_%M_%S")  # Timestamp
 
 # Combine the overall statistics
 df_results = pd.concat(results)
+
+print(f"\n\nEvolutions complete for {INSTANCES}\n")
+
 # Save ALL the results to CSV
 f_name = f"{SAVEPATH}/{now}_online_results.csv"
 df_results.to_csv(f_name)
@@ -77,7 +84,3 @@ print(f"\nResults saved to {f_name}")
 # Save the best performers to JSON
 with open(f"{SAVEPATH}/{now}_best_genomes.json", 'w') as file:
     json.dump(best_performers, file)
-
-
-def evolve_island(ea_instance, enemy):
-    raise DeprecationWarning("Parallelisation is unreliable.")

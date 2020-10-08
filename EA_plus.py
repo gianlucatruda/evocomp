@@ -18,18 +18,17 @@ N_HIDDEN_NEURONS = 10  # how many neurons in the hidden layer of the NN
 IND_SIZE = 21 * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS + 1) * 5
 
 
-class BaselineEAInstance(BaseEAInstance):
+class PlusEAInstance(BaseEAInstance):
     def __init__(self,
                  experiment_directory='experiments/tmp',
                  enemies=[2],
                  CXPB=0.5,
                  MUTPB=0.3,
-                 NGEN=15,
-                 POPSIZE=30,
+                 NGEN=20,
+                 POPSIZE=20,
                  HOFSIZE=5,
-                 multiplemode="no",
-                 seeding_path=None,
-                 ):
+                 LAMBDA=None,
+                 multiplemode="no"):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
         self.multiplemode = multiplemode
@@ -38,8 +37,15 @@ class BaselineEAInstance(BaseEAInstance):
         self.CXPB = CXPB  # Probability of mating two individuals
         self.MUTPB = MUTPB  # Probability of mutating an individual
         self.NGEN = NGEN  # The number of generations
-        self.POPSIZE = POPSIZE  # Number of individuals per generation (population size)
+        # Number of individuals per generation (population size)
+        self.POPSIZE = POPSIZE
         self.HOFSIZE = HOFSIZE  # Maximum size of hall of fame (best genomes)
+
+        self.MU = self.POPSIZE # Number of individuals to select for next generation
+        self.LAMBDA = LAMBDA # Number of children to make each generation
+
+        if self.LAMBDA is None:
+            self.LAMBDA = int(2 * self.MU)
 
         # Set directory for saving logs and experiment states
         if not os.path.exists(self.experiment_directory):
@@ -55,10 +61,6 @@ class BaselineEAInstance(BaseEAInstance):
 
         # Create a new "toolbox"
         self.toolbox = base.Toolbox()
-        if seeding_path:
-            self.toolbox.register("seeded_population", evo_utils.init_population, list, creator.Individual,
-                                  seeding_path)
-
         # Attributes for our individuals are initialised as random floats
         self.toolbox.register("attribute", random.uniform, -1, 1)
         self.toolbox.register("individual", tools.initRepeat, creator.Individual,
@@ -67,12 +69,10 @@ class BaselineEAInstance(BaseEAInstance):
         self.toolbox.register(
             "population", tools.initRepeat, list, self.toolbox.individual)
 
-
-        #base.population += base.toolbox.population_guess()
-
         # We set our operators
         self.toolbox.register("mate", tools.cxUniform, indpb=0.5)
-        self.toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=1, indpb=MUTPB)
+        self.toolbox.register("mutate", tools.mutGaussian,
+                              mu=0, sigma=1, indpb=MUTPB)
         self.toolbox.register("select", tools.selTournament, tournsize=3)
 
         # We then add our custom evaluation function to our toolbox
@@ -85,12 +85,7 @@ class BaselineEAInstance(BaseEAInstance):
                               )
 
         # Initialise our population
-        seeded_population = []
-        if seeding_path:
-            seeded_population = self.toolbox.seeded_population()
-        if POPSIZE - len(seeded_population) < 0:
-            print(f'Seeded population exceeds the given population size, corrected to {len(seeded_population)}')
-        self.population = self.toolbox.population(n=max(0, POPSIZE - len(seeded_population))) + seeded_population
+        self.population = self.toolbox.population(n=POPSIZE)
 
         # Create Hall of Fame (keeps N best individuals over all history)
         self.hall_of_fame = tools.HallOfFame(maxsize=HOFSIZE)
@@ -103,8 +98,10 @@ class BaselineEAInstance(BaseEAInstance):
         if verbose:
             print(f"\nRunning EA for {self.NGEN} generations...\n")
 
-        self.final_population, self.logbook = algorithms.eaSimple(
-            self.population, self.toolbox, self.CXPB, self.MUTPB, self.NGEN,
+        self.final_population, self.logbook = algorithms.eaMuPlusLambda(
+            self.population, self.toolbox,
+            self.MU, self.LAMBDA,
+            self.CXPB, self.MUTPB, self.NGEN,
             halloffame=self.hall_of_fame, stats=self.stats, verbose=verbose)
 
         # Get dataframe of stats

@@ -30,7 +30,7 @@ if not os.path.exists(EXPERIMENT_DIRECTORY):
 
 N_HIDDEN_NEURONS = 10  # how many neurons in the hidden layer of the NN
 # Genotype size
-IND_SIZE = ((21) * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS+1)*5) * 2
+IND_SIZE = ((21) * N_HIDDEN_NEURONS + (N_HIDDEN_NEURONS+1)*5)
 
 # Define some NB parameters for our EA
 CXPB = 0.5  # Probability of mating two individuals

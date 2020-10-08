@@ -1,4 +1,5 @@
 import os
+import sys
 import pandas as pd
 import numpy as np
 from matplotlib import pyplot as plt
@@ -216,10 +217,16 @@ def stat_test_t(df):
 
 
 if __name__ == "__main__":
-    online_results = pd.read_csv(
-        'results/09-30-13_32_18_online_results.csv')
-    offline_results = pd.read_csv(
-        'results/09-30-14_07_49_offline_results.csv')
+
+    # Quick inspection of results
+    # df = pd.read_csv('experiments/tmp/10-07-13_47_16_logbook.csv')
+    # inspect_evolution_stats(df)
+
+    if len(sys.argv) < 3:
+        sys.exit("Need python3 visualiser.py <online_results> <offline_results> [optional genomes]")
+
+    online_results = pd.read_csv(sys.argv[1])
+    offline_results = pd.read_csv(sys.argv[2])
 
     # Format the data and calculate statistics
     online_summary = format_online_results(online_results)
@@ -251,16 +258,11 @@ if __name__ == "__main__":
     print(df_offline.to_latex(index=False))
 
     # Diversity comparisons
-    df_div = diversity_comparison(
-        'results/09-30-13_32_18_best_genomes.json')
-
-    # Clean up names and ordering in dataframe
-    df_div.columns = [tidy_instance_name(x) for x in df_div.columns]
-    # df_div = df_div[sorted([c for c in df_div.columns])]
-    df_div.reset_index(inplace=True)
-    print("\nDiversity results", df_div, sep='\n', end='\n\n\n')
-    print(df_div.to_latex(index=False))
-
-    # Quick inspection of results
-    df = pd.read_csv('experiments/tmp/09-30-12_48_51_logbook.csv')
-    inspect_evolution_stats(df)
+    if len(sys.argv) == 4:
+        df_div = diversity_comparison(sys.argv[3])
+        # Clean up names and ordering in dataframe
+        df_div.columns = [tidy_instance_name(x) for x in df_div.columns]
+        # df_div = df_div[sorted([c for c in df_div.columns])]
+        df_div.reset_index(inplace=True)
+        print("\nDiversity results", df_div, sep='\n', end='\n\n\n')
+        print(df_div.to_latex(index=False))
