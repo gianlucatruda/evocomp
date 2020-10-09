@@ -24,11 +24,26 @@ class BaselineEAInstance(BaseEAInstance):
                  enemies=[2],
                  CXPB=0.5,
                  MUTPB=0.3,
-                 NGEN=15,
+                 NGEN=30,
                  POPSIZE=30,
                  HOFSIZE=5,
                  multiplemode="no",
                  seeding_path=None,
+                #  seeding_path=[
+                #      "solutions/best.txt",
+                #      "solutions/best_10-08-10_06_44.txt",
+                #      "solutions/best_10-08-10_06_48.txt",
+                #      "solutions/dynamic_generalist_44.txt",
+                #      "solutions/best_10-07-17_30_01.txt",
+                #      "solutions/best_10-08-10_06_45.txt",
+                #      "solutions/best_10-08-10_06_49.txt",
+                #      "solutions/best_10-08-10_06_42.txt",
+                #      "solutions/best_10-08-10_06_46.txt",
+                #      "solutions/best_10-08-10_06_50.txt",
+                #      "solutions/best_10-08-10_06_43.txt",
+                #      "solutions/best_10-08-10_06_47.txt",
+                #      "solutions/best_10-08-10_06_51.txt",
+                # ],
                  ):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
