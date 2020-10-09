@@ -28,22 +28,17 @@ class BaselineEAInstance(BaseEAInstance):
                  POPSIZE=30,
                  HOFSIZE=5,
                  multiplemode="no",
-                 seeding_path=None,
-                #  seeding_path=[
-                #      "solutions/best.txt",
-                #      "solutions/best_10-08-10_06_44.txt",
-                #      "solutions/best_10-08-10_06_48.txt",
-                #      "solutions/dynamic_generalist_44.txt",
-                #      "solutions/best_10-07-17_30_01.txt",
-                #      "solutions/best_10-08-10_06_45.txt",
-                #      "solutions/best_10-08-10_06_49.txt",
-                #      "solutions/best_10-08-10_06_42.txt",
-                #      "solutions/best_10-08-10_06_46.txt",
-                #      "solutions/best_10-08-10_06_50.txt",
-                #      "solutions/best_10-08-10_06_43.txt",
-                #      "solutions/best_10-08-10_06_47.txt",
-                #      "solutions/best_10-08-10_06_51.txt",
-                # ],
+                #  seeding_path=None,
+                 seeding_path=[
+                     "solutions/best.txt",
+                     "solutions/best_10-08-10_06_48.txt",
+                     "solutions/dynamic_generalist_44.txt",
+                     "solutions/best_10-07-17_30_01.txt",
+                     "solutions/best_10-08-10_06_45.txt",
+                     "solutions/best_10-08-10_06_51.txt",
+                     "solutions/10-06-14_11_42_best_individuals_1234_5050_cx1mut03.json",
+                    "solutions/10-08-23_02_22_best_individuals.json",
+                ],
                  ):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
