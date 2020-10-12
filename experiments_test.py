@@ -31,7 +31,7 @@ import evo_utils
 from simple_controller import player_controller
 
 # INSTANCES = [CommaEAInstance, PlusEAInstance]
-INSTANCES = [DynamicEAInstance, BaselineEAInstance]
+INSTANCES = [DynamicEAInstance, BaselineEAInstance, PlusEAInstance]
 
 if __name__ == '__main__':
     # Read the results from the specified path
@@ -66,6 +66,7 @@ if __name__ == '__main__':
                 _enemies = [_enemies]
             else:
                 multi = "yes"
+                _enemies = [1, 2, 3, 4, 5, 6, 7, 8]
 
             print(f"\nEnemies: {enemies}")
             top_ten = best_performers[str(ea_instance)][enemies]

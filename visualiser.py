@@ -9,6 +9,7 @@ from scipy import stats
 from evo_utils import diversity_comparison
 
 SAVE_DPI = 300
+COLOURS = ['gray', 'blue', 'red']
 
 if not os.path.exists('figs'):
     os.makedirs('figs')
@@ -73,27 +74,32 @@ def specialist_lineplots(df: pd.DataFrame, save_path=None):
     instances = df['ea_instance'].unique()
 
     fig, ax = plt.subplots(n_enemies, 1)
-    colours = ['blue', 'red']
 
     for i, enemy in enumerate(enemies):
         for j, instance in enumerate(instances):
-            colour = colours[j]
+            colour = COLOURS[j]
             _df = df[(df['enemies'] == enemy) & (
                 df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='mean_fitness_mean', yerr='mean_fitness_std',
                           ax=ax[i], c=colour, label=f'{instance} mean fitness', alpha=0.7, markersize=5, capsize=2)
             _df.plot.line(x='gen', y='max_fitness_mean', yerr='max_fitness_std',
                           ax=ax[i], c=colour, linestyle='--', label=f'{instance} max fitness', alpha=0.7, markersize=5, capsize=2)
-            ax[i].set_title(f'Enemy: {enemy}')
+            ax[i].set_title(f'Training enemies: {enemy}')
             ax[i].set_xlabel('')
             handles, labels = ax[i].get_legend_handles_labels()
             ax[i].get_legend().remove()
 
-    fig.legend(handles, labels, loc='lower right', framealpha=1.0)
+    fig.legend(handles, labels,
+        framealpha=1.0,
+        loc='lower center',
+        fancybox=False,
+        shadow=False,
+        ncol=3)
 
     plt.xlabel('Generation')
     plt.ylabel('Fitness score')
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.2)
     if save_path is not None:
         plt.savefig(save_path, dpi=SAVE_DPI)
     plt.show()
@@ -112,7 +118,7 @@ def specialist_boxplots(df: pd.DataFrame, save_path=None):
     for i, enemy in enumerate(enemies):
         _df = df[df['enemies'] == enemy]
         _df.boxplot(column='gain', by='ea_instance', grid=False, ax=ax[i])
-        ax[i].set_title(f'Enemies: {enemy}')
+        ax[i].set_title(f'Training enemies: {enemy}')
         ax[i].set_ylabel('Gain score')
         ax[i].set_xlabel('')
         ax[i].tick_params(axis='x', labelrotation=90)
@@ -134,25 +140,30 @@ def diversity_compare(df: pd.DataFrame, save_path=None):
     instances = df['ea_instance'].unique()
 
     fig, ax = plt.subplots(n_enemies, 1)
-    colours = ['blue', 'red']
 
     for i, enemy in enumerate(enemies):
         for j, instance in enumerate(instances):
-            colour = colours[j]
+            colour = COLOURS[j]
             _df = df[(df['enemies'] == enemy) & (
                 df['ea_instance'] == instance)]
             _df.plot.line(x='gen', y='diversity_mean', yerr='diversity_std', fmt='.-',
                           ax=ax[i], c=colour, label=f'{instance} diversity', alpha=0.7, markersize=5, capsize=2)
-            ax[i].set_title(f'Enemies: {enemy}')
+            ax[i].set_title(f'Training enemies: {enemy}')
             ax[i].set_xlabel('')
             handles, labels = ax[i].get_legend_handles_labels()
             ax[i].get_legend().remove()
 
-    fig.legend(handles, labels, loc='lower right', framealpha=1.0)
+    fig.legend(handles, labels,
+                framealpha=1.0,
+                loc='lower center',
+                fancybox=False,
+                shadow=False,
+                ncol=3)
 
     plt.xlabel('Generation')
     plt.ylabel('Relative population diversity')
     plt.tight_layout()
+    plt.subplots_adjust(bottom=0.2)
     if save_path is not None:
         plt.savefig(save_path, dpi=SAVE_DPI)
     plt.show()
@@ -190,26 +201,27 @@ def stat_test_t(df):
 
     # Load names of EA instances
     instances = df['ea_instance'].unique()
-    if len(instances) != 2:
-        raise ValueError(
-            "Need exactly 2 EA instances to do significance tests")
-    ea1, ea2 = instances[0], instances[1]
 
-    stats_results = {'enemies': [], 'statistic': [], 'p_value': []}
+    baseline = instances[0]
 
-    for enemy in df['enemies'].unique():
-        gains1 = df[(df['ea_instance'] == ea1) & (
-            df['enemies'] == enemy)]['gain'].values
-        gains2 = df[(df['ea_instance'] == ea2) & (
-            df['enemies'] == enemy)]['gain'].values
+    for ea in instances[1:]:
 
-        # Perform independent t-test for that enemy
-        w, p = stats.ttest_ind(gains1, gains2)
+        stats_results = {'enemies': [], 'statistic': [], 'p_value': []}
 
-        # Save results to dictionary of lists
-        stats_results['enemies'].append(enemy)
-        stats_results['statistic'].append(w)
-        stats_results['p_value'].append(p)
+        for enemy in df['enemies'].unique():
+            gains1 = df[(df['ea_instance'] == baseline) & (
+                df['enemies'] == enemy)]['gain'].values
+            gains2 = df[(df['ea_instance'] == ea) & (
+                df['enemies'] == enemy)]['gain'].values
+
+            # Perform independent t-test for that enemy
+            w, p = stats.ttest_ind(gains1, gains2)
+
+            # Save results to dictionary of lists
+            stats_results['enemies'].append(enemy)
+            stats_results['statistic'].append(w)
+            stats_results['p_value'].append(p)
+            print(f"p-val: {instances[0]} vs {ea}: {p}")
 
     # Make dataframe of significance results
     df = pd.DataFrame(stats_results)
@@ -252,10 +264,10 @@ if __name__ == "__main__":
     df_offline = df_offline.pivot(
         index='enemies', columns='ea_instance', values='gain')
 
-    df_offline = df_offline.merge(df_sig, on='enemies')
+    # df_offline = df_offline.merge(df_sig, on='enemies')
     df_offline = df_offline.round(4)
     print("\nOffline results", df_offline, sep='\n', end='\n\n')
-    print(df_offline.to_latex(index=False))
+    print(df_offline.to_latex(index=True))
 
     # Diversity comparisons
     if len(sys.argv) == 4:

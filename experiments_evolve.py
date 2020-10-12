@@ -28,7 +28,9 @@ ENEMIES = [[1, 2, 7], [4, 6, 7]]
 REPEATS = 10
 VERBOSE = False
 # INSTANCES = [CommaEAInstance, PlusEAInstance]
-INSTANCES = [DynamicEAInstance, BaselineEAInstance]
+# INSTANCES = [DynamicEAInstance, BaselineEAInstance]
+INSTANCES = [BaselineEAInstance]
+# INSTANCES = [DynamicEAInstance]
 
 # Automatically infers specialist or generalist from ENEMIES nesting
 multi = "yes" if any(isinstance(i, list) for i in ENEMIES) else "no"

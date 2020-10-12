@@ -25,11 +25,21 @@ class DynamicEAInstance(BaseEAInstance):
                  enemies=[2],
                  CXPB=1.0,
                  MUTPB=0.8,
-                 NGEN=15,
+                 NGEN=30,
                  POPSIZE=30,
                  HOFSIZE=5,
                  multiplemode="no",
-                 seeding_path=None,
+                #  seeding_path=None,
+                 seeding_path=[
+                     "solutions/best.txt",
+                     "solutions/best_10-08-10_06_48.txt",
+                     "solutions/dynamic_generalist_44.txt",
+                     "solutions/best_10-07-17_30_01.txt",
+                     "solutions/best_10-08-10_06_45.txt",
+                     "solutions/best_10-08-10_06_51.txt",
+                     "solutions/10-06-14_11_42_best_individuals_1234_5050_cx1mut03.json",
+                    "solutions/10-08-23_02_22_best_individuals.json",
+                ],
                  ):
         self.experiment_directory = experiment_directory
         self.enemies = enemies
@@ -239,8 +249,8 @@ if __name__ == "__main__":
     os.putenv("SDL_VIDEODRIVER", "fbcon")
     os.environ["SDL_VIDEODRIVER"] = 'dummy'
     ea_instance = DynamicEAInstance(
-        NGEN=50,
-        enemies=[1, 2, 3, 4, 5, 6, 7, 8],
+        NGEN=5,
+        enemies=[1, 2, 3],
         multiplemode="yes",
         # seeding_path="experiments/tmp/10-07-16_52_16_best_individuals.json",
         )

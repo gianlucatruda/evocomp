@@ -47,7 +47,7 @@ class CustomEASimple(evo_utils.BaseEAInstance):
         # Define some NB parameters for our EA
         self.CXPB = 0.7  # Probability of mating two individuals
         self.MUTPB = 0.3  # Probability of mutating an individual
-        self.NGEN = 15  # The number of generations
+        self.NGEN = 30  # The number of generations
         self.POPSIZE = 30  # Number of individuals per generation (population size)
         self.HOFSIZE = 5  # Maximum size of hall of fame (best genomes)
 
